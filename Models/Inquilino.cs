@@ -1,0 +1,19 @@
+using System.ComponentModel.DataAnnotations;
+
+public class Inquilino
+{
+    [Key]
+    public int IdInquilino { get; set; }
+
+    [Required, StringLength(10), Display(Name = "dni")]
+    public string dni { get; set; } = "";
+
+    [Required, StringLength(50), Display(Name = "Nombre")]
+    public string Nombre { get; set; } = "";
+
+    [Required, StringLength(50), Display(Name = "Apellido")]
+    public string Apellido { get; set; } = "";
+
+    [Required, StringLength(100), Display(Name = "Email")]
+    public string Email { get; set; } = "";
+}
