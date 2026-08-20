@@ -1,0 +1,21 @@
+@model List<Inquilino>
+<h1>Inquilinos</h1>
+<a asp-action="Create" class="btn btn-primary">Nuevo</a>
+<table class="table">
+    <thead><tr><th>Nombre</th><th>Contacto</th><th></th></tr></thead>
+    <tbody>
+    @foreach (var i in Model)
+    {
+        <tr>
+            <td>@i.DNI</td>
+            <td>@i.Nombre</td>
+            <td>@i.Apellido</td>
+            <td>@i.Email</td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@i.IdInquilino">Editar</a> |
+                <a asp-action="Delete" asp-route-id="@i.IdInquilino">Eliminar</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
