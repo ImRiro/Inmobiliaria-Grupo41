@@ -16,13 +16,16 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `inquilinos`
+-- Table structure for table `Inquilinos`
 --
 
-DROP TABLE IF EXISTS `inquilinos`;
+CREATE DATABASE IF NOT EXISTS `inmobiliaria-lab2` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+USE `inmobiliaria-lab2`;
+
+DROP TABLE IF EXISTS `Inquilinos`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `inquilinos` (
+CREATE TABLE `Inquilinos` (
   `Id` int NOT NULL AUTO_INCREMENT,
   `DNI` varchar(10) NOT NULL,
   `Nombre` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
@@ -34,23 +37,23 @@ CREATE TABLE `inquilinos` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `inquilinos`
+-- Dumping data for table `Inquilinos`
 --
 
-LOCK TABLES `inquilinos` WRITE;
-/*!40000 ALTER TABLE `inquilinos` DISABLE KEYS */;
-INSERT INTO `inquilinos` VALUES (1,'12123123','Elin','ReservadorSerial@gmail.com','Quilino');
-/*!40000 ALTER TABLE `inquilinos` ENABLE KEYS */;
+LOCK TABLES `Inquilinos` WRITE;
+/*!40000 ALTER TABLE `Inquilinos` DISABLE KEYS */;
+INSERT INTO `Inquilinos` VALUES (1,'12123123','Elin','ReservadorSerial@gmail.com','Quilino');
+/*!40000 ALTER TABLE `Inquilinos` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `propietarios`
+-- Table structure for table `Propietarios`
 --
 
-DROP TABLE IF EXISTS `propietarios`;
+DROP TABLE IF EXISTS `Propietarios`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `propietarios` (
+CREATE TABLE `Propietarios` (
   `Id` int NOT NULL AUTO_INCREMENT,
   `DNI` varchar(10) NOT NULL,
   `Nombre` varchar(150) NOT NULL,
@@ -62,13 +65,13 @@ CREATE TABLE `propietarios` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `propietarios`
+-- Dumping data for table `Propietarios`
 --
 
-LOCK TABLES `propietarios` WRITE;
-/*!40000 ALTER TABLE `propietarios` DISABLE KEYS */;
-INSERT INTO `propietarios` VALUES (7,'50100100','Roman','Riquelme','JRR10@gmail.com'),(8,'40100100','Lucas','Rodriguez','LuisLuisRodriguez@gmail.com');
-/*!40000 ALTER TABLE `propietarios` ENABLE KEYS */;
+LOCK TABLES `Propietarios` WRITE;
+/*!40000 ALTER TABLE `Propietarios` DISABLE KEYS */;
+INSERT INTO `Propietarios` VALUES (7,'50100100','Roman','Riquelme','JRR10@gmail.com'),(8,'40100100','Lucas','Rodriguez','LuisLuisRodriguez@gmail.com');
+/*!40000 ALTER TABLE `Propietarios` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
