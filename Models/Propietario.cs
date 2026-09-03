@@ -17,5 +17,6 @@ public class Propietario
     [Required, StringLength(100), Display(Name = "Email")]
     public string Email { get; set; } = "";
 
+
     public string NombreCompleto => $"{Nombre} {Apellido}".Trim();
 }

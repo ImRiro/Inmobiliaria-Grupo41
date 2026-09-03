@@ -8,6 +8,32 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
         
     }
 
+    private const string SelectBase = @"
+        SELECT r.Id, r.IdInmueble, r.IdInquilino, r.Fecha_Desde, r.Fecha_Hasta, r.Fecha_Cancelacion,
+               r.Monto_Diario, r.Costo_Total,
+               inm.Direccion AS DireccionInmueble,
+               CONCAT(q.Nombre, ' ', q.Apellido) AS NombreInquilino
+        FROM Reserva r
+        INNER JOIN Inmueble inm ON r.IdInmueble = inm.Id
+        INNER JOIN Inquilinos q ON r.IdInquilino = q.Id";
+
+    private static Reserva LeerReserva(MySqlDataReader reader)
+    {
+        return new Reserva
+        {
+            IdReserva = reader.GetInt32(reader.GetOrdinal("Id")),
+            IdInmueble = reader.GetInt32(reader.GetOrdinal("IdInmueble")),
+            IdInquilino = reader.GetInt32(reader.GetOrdinal("IdInquilino")),
+            Fecha_Desde = reader.GetDateTime(reader.GetOrdinal("Fecha_Desde")),
+            Fecha_Hasta = reader.GetDateTime(reader.GetOrdinal("Fecha_Hasta")),
+            Fecha_Cancelacion = reader.IsDBNull(reader.GetOrdinal("Fecha_Cancelacion")) ? null : reader.GetDateTime(reader.GetOrdinal("Fecha_Cancelacion")),
+            Monto_Diario = reader.GetDecimal(reader.GetOrdinal("Monto_Diario")),
+            Costo_Total = reader.GetDecimal(reader.GetOrdinal("Costo_Total")),
+            DireccionInmueble = reader.GetString(reader.GetOrdinal("DireccionInmueble")),
+            NombreInquilino = reader.GetString(reader.GetOrdinal("NombreInquilino"))
+        };
+    }
+
     public async Task<List<Reserva>> ObtenerTodosAsync()
     {
         var lista = new List<Reserva>();
@@ -15,23 +41,13 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
         using var connection = new MySqlConnection(connectionString);
         await connection.OpenAsync();
 
-        var query = "SELECT Id, IdInmueble, IdInquilino, Fecha_Desde, Fecha_Hasta, Fecha_Cancelacion, Monto_Diario, Costo_Total FROM Reserva";
+        var query = SelectBase + " ORDER BY r.Fecha_Desde DESC";
         using var command = new MySqlCommand(query, connection);
         using var reader = await command.ExecuteReaderAsync();
 
         while (await reader.ReadAsync())
         {
-            lista.Add(new Reserva
-            {
-                IdReserva = reader.GetInt32(reader.GetOrdinal("Id")),
-                IdInmueble = reader.GetInt32(reader.GetOrdinal("IdInmueble")),
-                IdInquilino = reader.GetInt32(reader.GetOrdinal("IdInquilino")),
-                Fecha_Desde = reader.GetDateTime(reader.GetOrdinal("Fecha_Desde")),
-                Fecha_Hasta = reader.GetDateTime(reader.GetOrdinal("Fecha_Hasta")),
-                Fecha_Cancelacion = reader.IsDBNull(reader.GetOrdinal("Fecha_Cancelacion")) ? DateTime.MinValue : reader.GetDateTime(reader.GetOrdinal("Fecha_Cancelacion")),
-                Monto_Diario = reader.GetDecimal(reader.GetOrdinal("Monto_Diario")),
-                Costo_Total = reader.GetDecimal(reader.GetOrdinal("Costo_Total"))
-            });
+            lista.Add(LeerReserva(reader));
         }
 
         return lista;
@@ -42,24 +58,14 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
         using var connection = new MySqlConnection(connectionString);
         await connection.OpenAsync();
 
-        var query = "SELECT Id, IdInmueble, IdInquilino, Fecha_Desde, Fecha_Hasta, Fecha_Cancelacion, Monto_Diario, Costo_Total FROM Reserva WHERE Id = @Id";
+        var query = SelectBase + " WHERE r.Id = @Id";
         using var command = new MySqlCommand(query, connection);
         command.Parameters.AddWithValue("@Id", id);
 
         using var reader = await command.ExecuteReaderAsync();
         if (await reader.ReadAsync())
         {
-            return new Reserva
-            {
-                IdReserva = reader.GetInt32(reader.GetOrdinal("Id")),
-                IdInmueble = reader.GetInt32(reader.GetOrdinal("IdInmueble")),
-                IdInquilino = reader.GetInt32(reader.GetOrdinal("IdInquilino")),
-                Fecha_Desde = reader.GetDateTime(reader.GetOrdinal("Fecha_Desde")),
-                Fecha_Hasta = reader.GetDateTime(reader.GetOrdinal("Fecha_Hasta")),
-                Fecha_Cancelacion = reader.IsDBNull(reader.GetOrdinal("Fecha_Cancelacion")) ? DateTime.MinValue : reader.GetDateTime(reader.GetOrdinal("Fecha_Cancelacion")),
-                Monto_Diario = reader.GetDecimal(reader.GetOrdinal("Monto_Diario")),
-                Costo_Total = reader.GetDecimal(reader.GetOrdinal("Costo_Total"))
-            };
+            return LeerReserva(reader);
         }
         return null;
     }

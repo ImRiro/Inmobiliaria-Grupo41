@@ -19,11 +19,18 @@ public class Reserva
     public DateTime Fecha_Hasta { get; set; }
 
     [Display(Name = "Fecha Cancelacion")]
-    public DateTime Fecha_Cancelacion { get; set; }
+    public DateTime? Fecha_Cancelacion { get; set; }
 
     [Required, Display(Name = "Monto Diario")]
     public decimal Monto_Diario { get; set; }
 
     [Required, Display(Name = "Costo Total")]
     public decimal Costo_Total { get; set; }
+
+    
+    [Display(Name = "Inmueble")]
+    public string? DireccionInmueble { get; set; }
+
+    [Display(Name = "Inquilino")]
+    public string? NombreInquilino { get; set; }
 }
