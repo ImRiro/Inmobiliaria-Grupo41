@@ -50,8 +50,8 @@ DROP TABLE IF EXISTS `inmueble`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `inmueble` (
   `Id` int NOT NULL AUTO_INCREMENT,
-  `id_propietario` int NOT NULL,
-  `id_tipoInmueble` int NOT NULL,
+  `idPropietario` int NOT NULL,
+  `IdTipoInmueble` int NOT NULL,
   `direccion` varchar(255) NOT NULL,
   `latitud` decimal(10,7) DEFAULT NULL,
   `longitud` decimal(10,7) DEFAULT NULL,
@@ -59,11 +59,11 @@ CREATE TABLE `inmueble` (
   `metros_cuadrados` decimal(10,2) DEFAULT NULL,
   `habitaciones` int DEFAULT NULL,
   PRIMARY KEY (`Id`),
-  KEY `fk_inmueble_propietario` (`id_propietario`),
-  KEY `fk_inmueble_tipo` (`id_tipoInmueble`),
-  CONSTRAINT `fk_inmueble_propietario` FOREIGN KEY (`id_propietario`) REFERENCES `propietarios` (`Id`),
-  CONSTRAINT `fk_inmueble_tipo` FOREIGN KEY (`id_tipoInmueble`) REFERENCES `tipoinmueble` (`Id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  KEY `fk_inmueble_propietario` (`idPropietario`),
+  KEY `fk_inmueble_tipo` (`IdTipoInmueble`),
+  CONSTRAINT `fk_inmueble_propietario` FOREIGN KEY (`idPropietario`) REFERENCES `propietarios` (`Id`),
+  CONSTRAINT `fk_inmueble_tipo` FOREIGN KEY (`IdTipoInmueble`) REFERENCES `tipoinmueble` (`Id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -72,6 +72,7 @@ CREATE TABLE `inmueble` (
 
 LOCK TABLES `inmueble` WRITE;
 /*!40000 ALTER TABLE `inmueble` DISABLE KEYS */;
+INSERT INTO `inmueble` VALUES (1,7,5,'Brandsen 805, La Boca, CABA',-34.6400000,-58.3600000,1,7001.00,5);
 /*!40000 ALTER TABLE `inmueble` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -140,19 +141,19 @@ DROP TABLE IF EXISTS `reserva`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `reserva` (
   `Id` int NOT NULL AUTO_INCREMENT,
-  `id_inmueble` int NOT NULL,
-  `id_inquilino` int NOT NULL,
+  `idinmueble` int NOT NULL,
+  `idinquilino` int NOT NULL,
   `fecha_desde` date NOT NULL,
   `fecha_hasta` date NOT NULL,
   `fecha_cancelacion` date DEFAULT NULL,
   `monto_diario` decimal(10,2) NOT NULL,
   `costo_total` decimal(10,2) NOT NULL,
   PRIMARY KEY (`Id`),
-  KEY `fk_reserva_inmueble` (`id_inmueble`),
-  KEY `fk_reserva_inquilino` (`id_inquilino`),
-  CONSTRAINT `fk_reserva_inmueble` FOREIGN KEY (`id_inmueble`) REFERENCES `inmueble` (`Id`),
-  CONSTRAINT `fk_reserva_inquilino` FOREIGN KEY (`id_inquilino`) REFERENCES `inquilinos` (`Id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  KEY `fk_reserva_inmueble` (`idinmueble`),
+  KEY `fk_reserva_inquilino` (`idinquilino`),
+  CONSTRAINT `fk_reserva_inmueble` FOREIGN KEY (`idinmueble`) REFERENCES `inmueble` (`Id`),
+  CONSTRAINT `fk_reserva_inquilino` FOREIGN KEY (`idinquilino`) REFERENCES `inquilinos` (`Id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -175,7 +176,7 @@ CREATE TABLE `tipoinmueble` (
   `Id` int NOT NULL AUTO_INCREMENT,
   `Nombre` varchar(100) NOT NULL,
   PRIMARY KEY (`Id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -184,6 +185,7 @@ CREATE TABLE `tipoinmueble` (
 
 LOCK TABLES `tipoinmueble` WRITE;
 /*!40000 ALTER TABLE `tipoinmueble` DISABLE KEYS */;
+INSERT INTO `tipoinmueble` VALUES (1,'Monoambiente'),(2,'Departamento'),(3,'Casa'),(4,'Duplex'),(5,'Terreno');
 /*!40000 ALTER TABLE `tipoinmueble` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -200,4 +202,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-09-03 16:36:54
+-- Dump completed on 2026-09-03 18:49:48
