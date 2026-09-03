@@ -29,4 +29,11 @@ public class Inmueble
 
     [Required, Display(Name = "Habitaciones")]
     public int Habitaciones { get; set; } = 0;
+
+
+    [Display(Name = "Propietario")]
+    public string? NombrePropietario { get; set; }
+
+    [Display(Name = "Tipo")]
+    public string? NombreTipoInmueble { get; set; }
 }

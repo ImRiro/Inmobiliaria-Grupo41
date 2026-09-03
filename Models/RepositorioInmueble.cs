@@ -8,6 +8,33 @@ public class RepositorioInmueble : RepositorioBase, IRepositorioInmueble
         
     }
     
+    private const string SelectBase = @"
+        SELECT i.Id, i.IdPropietario, i.IdTipoInmueble, i.Direccion, i.Latitud, i.Longitud,
+               i.Activo, i.Metros_Cuadrados, i.Habitaciones,
+               CONCAT(p.Nombre, ' ', p.Apellido) AS NombrePropietario,
+               t.Nombre AS NombreTipoInmueble
+        FROM Inmueble i
+        INNER JOIN Propietarios p ON i.IdPropietario = p.Id
+        INNER JOIN TipoInmueble t ON i.IdTipoInmueble = t.Id";
+
+    private static Inmueble LeerInmueble(MySqlDataReader reader)
+    {
+        return new Inmueble
+        {
+            IdInmueble = reader.GetInt32(reader.GetOrdinal("Id")),
+            IdPropietario = reader.GetInt32(reader.GetOrdinal("IdPropietario")),
+            IdTipoInmueble = reader.GetInt32(reader.GetOrdinal("IdTipoInmueble")),
+            Direccion = reader.GetString(reader.GetOrdinal("Direccion")),
+            Latitud = reader.GetDecimal(reader.GetOrdinal("Latitud")),
+            Longitud = reader.GetDecimal(reader.GetOrdinal("Longitud")),
+            Activo = reader.GetBoolean(reader.GetOrdinal("Activo")),
+            Metros_Cuadrados = reader.GetInt32(reader.GetOrdinal("Metros_Cuadrados")),
+            Habitaciones = reader.GetInt32(reader.GetOrdinal("Habitaciones")),
+            NombrePropietario = reader.GetString(reader.GetOrdinal("NombrePropietario")),
+            NombreTipoInmueble = reader.GetString(reader.GetOrdinal("NombreTipoInmueble"))
+        };
+    }
+
     public async Task<List<Inmueble>> ObtenerTodosAsync()
     {
         var lista = new List<Inmueble>();
@@ -15,24 +42,13 @@ public class RepositorioInmueble : RepositorioBase, IRepositorioInmueble
         using var connection = new MySqlConnection(connectionString);
         await connection.OpenAsync();
 
-        var query = "SELECT Id, IdPropietario, IdTipoInmueble, Direccion, Latitud, Longitud, Activo, Metros_Cuadrados, Habitaciones FROM Inmueble";
+        var query = SelectBase + " ORDER BY i.Id";
         using var command = new MySqlCommand(query, connection);
         using var reader = await command.ExecuteReaderAsync();
 
         while (await reader.ReadAsync())
         {
-            lista.Add(new Inmueble
-            {
-                IdInmueble = reader.GetInt32(reader.GetOrdinal("Id")),
-                IdPropietario = reader.GetInt32(reader.GetOrdinal("IdPropietario")),
-                IdTipoInmueble = reader.GetInt32(reader.GetOrdinal("IdTipoInmueble")),
-                Direccion = reader.GetString(reader.GetOrdinal("Direccion")),
-                Latitud = reader.GetDecimal(reader.GetOrdinal("Latitud")),
-                Longitud = reader.GetDecimal(reader.GetOrdinal("Longitud")),
-                Activo = reader.GetBoolean(reader.GetOrdinal("Activo")),
-                Metros_Cuadrados = reader.GetDecimal(reader.GetOrdinal("Metros_Cuadrados")),
-                Habitaciones = reader.GetInt32(reader.GetOrdinal("Habitaciones"))
-            });
+            lista.Add(LeerInmueble(reader));
         }
 
         return lista;
@@ -43,25 +59,14 @@ public class RepositorioInmueble : RepositorioBase, IRepositorioInmueble
         using var connection = new MySqlConnection(connectionString);
         await connection.OpenAsync();
 
-        var query = "SELECT Id, IdPropietario, IdTipoInmueble, Direccion, Latitud, Longitud, Activo, Metros_Cuadrados, Habitaciones FROM Inmueble WHERE Id = @Id";
+        var query = SelectBase + " WHERE i.Id = @Id";
         using var command = new MySqlCommand(query, connection);
         command.Parameters.AddWithValue("@Id", id);
 
         using var reader = await command.ExecuteReaderAsync();
         if (await reader.ReadAsync())
         {
-            return new Inmueble
-            {
-                IdInmueble = reader.GetInt32(reader.GetOrdinal("Id")),
-                IdPropietario = reader.GetInt32(reader.GetOrdinal("IdPropietario")),
-                IdTipoInmueble = reader.GetInt32(reader.GetOrdinal("IdTipoInmueble")),
-                Direccion = reader.GetString(reader.GetOrdinal("Direccion")),
-                Latitud = reader.GetDecimal(reader.GetOrdinal("Latitud")),
-                Longitud = reader.GetDecimal(reader.GetOrdinal("Longitud")),
-                Activo = reader.GetBoolean(reader.GetOrdinal("Activo")),
-                Metros_Cuadrados = reader.GetDecimal(reader.GetOrdinal("Metros_Cuadrados")),
-                Habitaciones = reader.GetInt32(reader.GetOrdinal("Habitaciones"))
-            };
+            return LeerInmueble(reader);
         }
         return null;
     }
