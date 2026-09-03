@@ -15,7 +15,7 @@ public class RepositorioInmueble : RepositorioBase, IRepositorioInmueble
         using var connection = new MySqlConnection(connectionString);
         await connection.OpenAsync();
 
-        var query = "SELECT IdInmueble, IdPropietario, IdTipoInmueble, Direccion, Latitud, Longitud, Activo, Metros_Cuadrados, Habitaciones FROM Inmueble";
+        var query = "SELECT Id, IdPropietario, IdTipoInmueble, Direccion, Latitud, Longitud, Activo, Metros_Cuadrados, Habitaciones FROM Inmueble";
         using var command = new MySqlCommand(query, connection);
         using var reader = await command.ExecuteReaderAsync();
 
@@ -23,7 +23,7 @@ public class RepositorioInmueble : RepositorioBase, IRepositorioInmueble
         {
             lista.Add(new Inmueble
             {
-                IdInmueble = reader.GetInt32(reader.GetOrdinal("IdInmueble")),
+                IdInmueble = reader.GetInt32(reader.GetOrdinal("Id")),
                 IdPropietario = reader.GetInt32(reader.GetOrdinal("IdPropietario")),
                 IdTipoInmueble = reader.GetInt32(reader.GetOrdinal("IdTipoInmueble")),
                 Direccion = reader.GetString(reader.GetOrdinal("Direccion")),
@@ -43,7 +43,7 @@ public class RepositorioInmueble : RepositorioBase, IRepositorioInmueble
         using var connection = new MySqlConnection(connectionString);
         await connection.OpenAsync();
 
-        var query = "SELECT IdInmueble, IdPropietario, IdTipoInmueble, Direccion, Latitud, Longitud, Activo, Metros_Cuadrados, Habitaciones FROM Inmueble WHERE IdInmueble = @Id";
+        var query = "SELECT Id, IdPropietario, IdTipoInmueble, Direccion, Latitud, Longitud, Activo, Metros_Cuadrados, Habitaciones FROM Inmueble WHERE Id = @Id";
         using var command = new MySqlCommand(query, connection);
         command.Parameters.AddWithValue("@Id", id);
 
@@ -52,7 +52,7 @@ public class RepositorioInmueble : RepositorioBase, IRepositorioInmueble
         {
             return new Inmueble
             {
-                IdInmueble = reader.GetInt32(reader.GetOrdinal("IdInmueble")),
+                IdInmueble = reader.GetInt32(reader.GetOrdinal("Id")),
                 IdPropietario = reader.GetInt32(reader.GetOrdinal("IdPropietario")),
                 IdTipoInmueble = reader.GetInt32(reader.GetOrdinal("IdTipoInmueble")),
                 Direccion = reader.GetString(reader.GetOrdinal("Direccion")),
@@ -93,7 +93,7 @@ public class RepositorioInmueble : RepositorioBase, IRepositorioInmueble
 
         var query = @"UPDATE Inmueble SET IdPropietario = @IdPropietario, IdTipoInmueble = @IdTipoInmueble, Direccion = @Direccion, 
                       Latitud = @Latitud, Longitud = @Longitud, Activo = @Activo, Metros_Cuadrados = @Metros_Cuadrados, 
-                      Habitaciones = @Habitaciones WHERE IdInmueble = @IdInmueble";
+                      Habitaciones = @Habitaciones WHERE Id = @IdInmueble";
         using var command = new MySqlCommand(query, connection);
         command.Parameters.AddWithValue("@IdInmueble", inmueble.IdInmueble);
         command.Parameters.AddWithValue("@IdPropietario", inmueble.IdPropietario);
@@ -113,7 +113,7 @@ public class RepositorioInmueble : RepositorioBase, IRepositorioInmueble
         using var connection = new MySqlConnection(connectionString);
         await connection.OpenAsync();
 
-        var query = "DELETE FROM Inmueble WHERE IdInmueble = @Id";
+        var query = "DELETE FROM Inmueble WHERE Id = @Id";
         using var command = new MySqlCommand(query, connection);
         command.Parameters.AddWithValue("@Id", id);
 
