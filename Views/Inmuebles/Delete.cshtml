@@ -1,0 +1,29 @@
+@model Inmueble
+
+<h1>Eliminar inmueble</h1>
+
+<h3>¿Está seguro que desea eliminar este inmueble?</h3>
+<div>
+    <dl class="row">
+        <dt class="col-sm-3">Dirección</dt>
+        <dd class="col-sm-9">@Model.Direccion</dd>
+
+        <dt class="col-sm-3">Propietario</dt>
+        <dd class="col-sm-9">@Model.IdPropietario</dd>
+
+        <dt class="col-sm-3">Tipo de inmueble</dt>
+        <dd class="col-sm-9">@Model.IdTipoInmueble</dd>
+
+        <dt class="col-sm-3">Metros cuadrados</dt>
+        <dd class="col-sm-9">@Model.Metros_Cuadrados</dd>
+
+        <dt class="col-sm-3">Habitaciones</dt>
+        <dd class="col-sm-9">@Model.Habitaciones</dd>
+    </dl>
+
+    <form asp-action="Delete" method="post">
+        <input type="hidden" asp-for="IdInmueble" />
+        <button type="submit" class="btn btn-danger">Eliminar</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>

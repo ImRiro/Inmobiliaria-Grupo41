@@ -1,0 +1,79 @@
+@model Inmueble
+
+@{
+    ViewData["Title"] = "Editar inmueble";
+}
+
+<h4>Editar inmueble</h4>
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Edit">
+            <input type="hidden" asp-for="IdInmueble" />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <label asp-for="IdPropietario" class="control-label"></label>
+                <select asp-for="IdPropietario" class="form-control" asp-items="ViewBag.Propietarios">
+                    <option value="">-- Seleccione un propietario --</option>
+                </select>
+                <span asp-validation-for="IdPropietario" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="IdTipoInmueble" class="control-label"></label>
+                <select asp-for="IdTipoInmueble" class="form-control" asp-items="ViewBag.TiposInmueble">
+                    <option value="">-- Seleccione un tipo --</option>
+                </select>
+                <span asp-validation-for="IdTipoInmueble" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Direccion" class="control-label"></label>
+                <input asp-for="Direccion" class="form-control" />
+                <span asp-validation-for="Direccion" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Metros_Cuadrados" class="control-label"></label>
+                <input asp-for="Metros_Cuadrados" class="form-control" />
+                <span asp-validation-for="Metros_Cuadrados" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Habitaciones" class="control-label"></label>
+                <input asp-for="Habitaciones" class="form-control" />
+                <span asp-validation-for="Habitaciones" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Latitud" class="control-label"></label>
+                <input asp-for="Latitud" class="form-control" />
+                <span asp-validation-for="Latitud" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Longitud" class="control-label"></label>
+                <input asp-for="Longitud" class="form-control" />
+                <span asp-validation-for="Longitud" class="text-danger"></span>
+            </div>
+
+            <div class="form-check my-3">
+                <input asp-for="Activo" class="form-check-input" />
+                <label asp-for="Activo" class="form-check-label"></label>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Guardar" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Volver al listado</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

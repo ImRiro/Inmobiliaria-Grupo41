@@ -1,0 +1,39 @@
+@model List<Inmueble>
+
+@{
+    ViewData["Title"] = "Inmuebles";
+}
+
+<h1>Inmuebles</h1>
+<a asp-action="Create" class="btn btn-primary">Nuevo</a>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Dirección</th>
+            <th>Propietario</th>
+            <th>Tipo</th>
+            <th>m²</th>
+            <th>Habitaciones</th>
+            <th>Activo</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var i in Model)
+    {
+        <tr>
+            <td>@i.Direccion</td>
+            <td>@i.IdPropietario</td>
+            <td>@i.IdTipoInmueble</td>
+            <td>@i.Metros_Cuadrados</td>
+            <td>@i.Habitaciones</td>
+            <td>@(i.Activo ? "Sí" : "No")</td>
+            <td>
+                <a asp-action="Details" asp-route-id="@i.IdInmueble" class="btn btn-sm btn-outline-secondary">Detalles</a>
+                <a asp-action="Edit" asp-route-id="@i.IdInmueble" class="btn btn-sm btn-outline-primary">Editar</a>
+                <a asp-action="Delete" asp-route-id="@i.IdInmueble" class="btn btn-sm btn-outline-danger">Eliminar</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
