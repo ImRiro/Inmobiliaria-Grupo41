@@ -19,5 +19,13 @@ https://www.figma.com/files/team/1614361052615337445/project/639110759?fuid=1614
 2. Ejecutar el script "Inmobiliaria-lab2-RomeroBustamante.sql" incluido en este repositorio
     - Si estas usando DBeaver como es mi caso tenes que crear una nueva Base de Datos, darle segundo click, ir a tools -> Restore Database, ahi te abre una ventana y en el campo "input" pones el archivo.
     - En el caso de XAMPP tambien deberas crear una base de datos previamente y luego importar el archivo.
-3. Verificar en "appsettings.json" que la cadena de conexión ("DefaultConnection") apunte al mismo usuario/contraseña (y base de datos si decidiste cambiarle el nombre) que usaste en tu instalación local de MySQL.
-4. Y eso deberia ser suficiente, la base de datos deberia tener en si simplemente las tablas Inquilino y Propietario con 1 y 2 records de prueba respectivamente.
+3. Configurar la cadena de conexión utilizando User Secrets. Esto permite almacenar información sensible, como el usuario y contraseña de MySQL, sin incluirla directamente en el repositorio.
+
+4. Desde la carpeta raíz del proyecto, configurar la cadena de conexión con el siguiente comando, reemplazando los valores por los correspondientes a tu instalación de MySQL:
+
+    `dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=localhost;Port=3306;Database=TU_BD;User=TU_USUARIO;Password=TU_CONTRASEÑA;"`
+    
+    Por ejemplo:
+
+    `dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=localhost;Port=3306;Database=Inmobiliaria;User=root;Password=1234;"`
+5. Y eso debería ser suficiente. Una vez configurada correctamente la cadena de conexión, la aplicación debería poder conectarse a la base de datos importada.
