@@ -1,0 +1,39 @@
+@model List<Reserva>
+
+@{
+    ViewData["Title"] = "Reservas";
+}
+
+<h1>Reservas</h1>
+<a asp-action="Create" class="btn btn-primary">Nueva</a>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Inmueble</th>
+            <th>Inquilino</th>
+            <th>Desde</th>
+            <th>Hasta</th>
+            <th>Costo total</th>
+            <th>Cancelada</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var r in Model)
+    {
+        <tr>
+            <td>@r.DireccionInmueble</td>
+            <td>@r.NombreInquilino</td>
+            <td>@r.Fecha_Desde.ToString("dd/MM/yyyy")</td>
+            <td>@r.Fecha_Hasta.ToString("dd/MM/yyyy")</td>
+            <td>@r.Costo_Total.ToString("C")</td>
+            <td>@(r.Fecha_Cancelacion.HasValue ? r.Fecha_Cancelacion.Value.ToString("dd/MM/yyyy") : "No")</td>
+            <td>
+                <a asp-action="Details" asp-route-id="@r.IdReserva" class="btn btn-sm btn-outline-secondary">Detalles</a>
+                <a asp-action="Edit" asp-route-id="@r.IdReserva" class="btn btn-sm btn-outline-primary">Editar</a>
+                <a asp-action="Delete" asp-route-id="@r.IdReserva" class="btn btn-sm btn-outline-danger">Eliminar</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

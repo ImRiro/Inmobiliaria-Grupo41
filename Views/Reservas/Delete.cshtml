@@ -1,0 +1,29 @@
+@model Reserva
+
+<h1>Eliminar reserva</h1>
+
+<h3>¿Está seguro que desea eliminar esta reserva?</h3>
+<div>
+    <dl class="row">
+        <dt class="col-sm-3">Inmueble</dt>
+        <dd class="col-sm-9">@Model.DireccionInmueble</dd>
+
+        <dt class="col-sm-3">Inquilino</dt>
+        <dd class="col-sm-9">@Model.NombreInquilino</dd>
+
+        <dt class="col-sm-3">Fecha desde</dt>
+        <dd class="col-sm-9">@Model.Fecha_Desde.ToString("dd/MM/yyyy")</dd>
+
+        <dt class="col-sm-3">Fecha hasta</dt>
+        <dd class="col-sm-9">@Model.Fecha_Hasta.ToString("dd/MM/yyyy")</dd>
+
+        <dt class="col-sm-3">Costo total</dt>
+        <dd class="col-sm-9">@Model.Costo_Total.ToString("C")</dd>
+    </dl>
+
+    <form asp-action="Delete" method="post">
+        <input type="hidden" asp-for="IdReserva" />
+        <button type="submit" class="btn btn-danger">Eliminar</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
