@@ -24,11 +24,11 @@ public class Inmueble
     [Required, Display(Name = "Activo")]
     public bool Activo { get; set; } = false;
 
-    [Required, Display(Name = "Metros Cuadrados")]
-    public decimal Metros_Cuadrados { get; set; } = 0;
-
-    [Required, Display(Name = "Habitaciones")]
+    [Required, Range(0, int.MaxValue, ErrorMessage = "Las habitaciones no pueden ser negativas"), Display(Name = "Habitaciones")]
     public int Habitaciones { get; set; } = 0;
+
+    [Required, Range(0, double.MaxValue, ErrorMessage = "Los metros cuadrados no pueden ser negativos"), Display(Name = "Metros Cuadrados")]
+    public decimal Metros_Cuadrados { get; set; } = 0;
 
 
     [Display(Name = "Propietario")]
