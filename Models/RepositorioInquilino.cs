@@ -16,7 +16,7 @@ public class RepositorioInquilino : RepositorioBase, IRepositorioInquilino
         using var connection = new MySqlConnection(connectionString);
         await connection.OpenAsync();
 
-        var query = "SELECT Id, DNI, Nombre, Apellido, Email FROM Inquilinos";
+        var query = "SELECT Id, DNI, Nombre, Apellido, Email FROM Inquilinos WHERE Activo = 1";
         using var command = new MySqlCommand(query, connection);
         using var reader = await command.ExecuteReaderAsync();
 
@@ -98,7 +98,7 @@ public class RepositorioInquilino : RepositorioBase, IRepositorioInquilino
         using var connection = new MySqlConnection(connectionString);
         await connection.OpenAsync();
 
-        var query = "DELETE FROM Inquilinos WHERE Id = @Id";
+        var query = "UPDATE Inquilinos SET activo = 0 WHERE Id = @Id";
         using var command = new MySqlCommand(query, connection);
         command.Parameters.AddWithValue("@Id", id);
 

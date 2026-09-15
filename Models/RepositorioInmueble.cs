@@ -118,7 +118,7 @@ public class RepositorioInmueble : RepositorioBase, IRepositorioInmueble
         using var connection = new MySqlConnection(connectionString);
         await connection.OpenAsync();
 
-        var query = "DELETE FROM Inmueble WHERE Id = @Id";
+        var query = "UPDATE Inmueble SET activo = 0 WHERE Id = @Id";
         using var command = new MySqlCommand(query, connection);
         command.Parameters.AddWithValue("@Id", id);
 

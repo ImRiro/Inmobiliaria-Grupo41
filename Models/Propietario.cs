@@ -17,5 +17,7 @@ public class Propietario
     [Required, StringLength(50), RegularExpression(@"^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$", ErrorMessage = "El apellido no puede contener números"), Display(Name = "Apellido")]
     public string Apellido { get; set; } = "";
 
+    public bool Activo { get; set; } = true;
+
     public string NombreCompleto => $"{Nombre} {Apellido}".Trim();
 }
