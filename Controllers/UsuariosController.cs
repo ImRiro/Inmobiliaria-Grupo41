@@ -171,14 +171,6 @@ public class UsuariosController : Controller
             ModelState.AddModelError(nameof(Usuario.Email), "Ya existe un usuario con ese email.");
         }
 
-        foreach (var state in ModelState)
-        {
-            foreach (var error in state.Value.Errors)
-            {
-                Console.WriteLine($"{state.Key}: {error.ErrorMessage}");
-            }
-        }
-
         if (!ModelState.IsValid)
         {
             return View(usuario);
