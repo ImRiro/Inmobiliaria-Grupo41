@@ -1,0 +1,20 @@
+@model List<Usuario>
+<h1>Usuarios</h1>
+<a asp-action="Create" class="btn btn-primary">Nuevo</a>
+<table class="table">
+    <thead><tr><th>Nombre</th><th>Email</th><th>Rol</th><th></th></tr></thead>
+    <tbody>
+    @foreach (var u in Model)
+    {
+        <tr>
+            <td>@u.NombreCompleto</td>
+            <td>@u.Email</td>
+            <td>@u.Rol</td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@u.IdUsuario">Editar</a> |
+                <a asp-action="Delete" asp-route-id="@u.IdUsuario">Eliminar</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

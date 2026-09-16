@@ -1,0 +1,55 @@
+@model Usuario
+
+@{
+    ViewData["Title"] = "Mi perfil";
+}
+
+<h4>Mi perfil</h4>
+<hr />
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success">@TempData["Mensaje"]</div>
+}
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Perfil">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label>Email</label>
+                <input class="form-control" value="@Model.Email" disabled />
+            </div>
+            <div class="form-group">
+                <label asp-for="Nombre" class="control-label"></label>
+                <input asp-for="Nombre" class="form-control" />
+                <span asp-validation-for="Nombre" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Apellido" class="control-label"></label>
+                <input asp-for="Apellido" class="form-control" />
+                <span asp-validation-for="Apellido" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AvatarUrl" class="control-label"></label>
+                <input asp-for="AvatarUrl" class="form-control" />
+            </div>
+            <hr />
+            <p class="text-muted">Completá esto solo si querés cambiar tu contraseña:</p>
+            <div class="form-group">
+                <label asp-for="ClavePlano" class="control-label">Nueva contraseña</label>
+                <input asp-for="ClavePlano" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="ConfirmarClave" class="control-label"></label>
+                <input asp-for="ConfirmarClave" class="form-control" />
+                <span asp-validation-for="ConfirmarClave" class="text-danger"></span>
+            </div>
+            <div class="form-group mt-3">
+                <input type="submit" value="Guardar cambios" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

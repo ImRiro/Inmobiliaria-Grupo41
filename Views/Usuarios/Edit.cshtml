@@ -1,0 +1,54 @@
+@model Usuario
+
+@{
+    ViewData["Title"] = "Editar Usuario";
+}
+
+<h4>Editar Usuario</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <input type="hidden" asp-for="IdUsuario" />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Nombre" class="control-label"></label>
+                <input asp-for="Nombre" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="Apellido" class="control-label"></label>
+                <input asp-for="Apellido" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="Email" class="control-label"></label>
+                <input asp-for="Email" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="Rol" class="control-label"></label>
+                <select asp-for="Rol" class="form-control">
+                    <option value="Empleado">Empleado</option>
+                    <option value="Administrador">Administrador</option>
+                </select>
+            </div>
+            <div class="form-group form-check">
+                <input asp-for="Activo" class="form-check-input" />
+                <label asp-for="Activo" class="form-check-label"></label>
+            </div>
+            <div class="form-group">
+                <label asp-for="ClavePlano" class="control-label">Nueva contraseña (opcional)</label>
+                <input asp-for="ClavePlano" class="form-control" placeholder="Dejar vacío para no cambiarla" />
+            </div>
+            <div class="form-group mt-3">
+                <input type="submit" value="Guardar" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Volver al listado</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
