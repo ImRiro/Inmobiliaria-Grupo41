@@ -1,0 +1,26 @@
+@model Pago
+@{
+    ViewData["Title"] = "Editar concepto de pago";
+}
+
+<h4>Editar concepto de pago</h4>
+<p class="text-muted">Solo se puede modificar el concepto. El monto (@Model.Monto.ToString("C")) y la fecha (@Model.Fecha.ToShortDateString()) no son editables.</p>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <input type="hidden" name="id" value="@Model.IdPago" />
+            <input type="hidden" name="idReserva" value="@Model.IdReserva" />
+            <div class="form-group">
+                <label>Concepto</label>
+                <input name="concepto" class="form-control" value="@Model.Concepto" required />
+            </div>
+            <div class="form-group mt-3">
+                <input type="submit" value="Guardar" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+<div class="mt-2">
+    <a asp-action="Index" asp-route-idReserva="@Model.IdReserva">Volver al listado</a>
+</div>

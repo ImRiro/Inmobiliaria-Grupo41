@@ -1,0 +1,104 @@
+@model List<Pago>
+@{
+    var reserva = (Reserva)ViewBag.Reserva;
+    var totalPagado = (decimal)ViewBag.TotalPagado;
+    var esAdmin = (bool)ViewBag.EsAdministrador;
+}
+
+<h4>Pagos de la reserva #@reserva.IdReserva</h4>
+<p>
+    <strong>Inmueble:</strong> @reserva.DireccionInmueble &nbsp;|&nbsp;
+    <strong>Inquilino:</strong> @reserva.NombreInquilino &nbsp;|&nbsp;
+    <strong>Costo total:</strong> @reserva.Costo_Total.ToString("C") &nbsp;|&nbsp;
+    <strong>Pagado (no anulado):</strong> @totalPagado.ToString("C")
+</p>
+<hr />
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success">@TempData["Mensaje"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Fecha</th>
+            <th>Concepto</th>
+            <th>Monto</th>
+            <th>Estado</th>
+            @if (esAdmin)
+            {
+                <th>Auditoría</th>
+            }
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var p in Model)
+    {
+        <tr class="@(p.Anulado ? "table-secondary text-muted" : "")">
+            <td>@p.Fecha.ToShortDateString()</td>
+            <td>@p.Concepto</td>
+            <td>@p.Monto.ToString("C")</td>
+            <td>
+                @if (p.Anulado)
+                {
+                    <span class="badge bg-secondary">Anulado @(p.FechaAnulacion?.ToShortDateString())</span>
+                }
+                else
+                {
+                    <span class="badge bg-success">Vigente</span>
+                }
+            </td>
+            @if (esAdmin)
+            {
+                <td class="small text-muted">
+                    Creado por: @(p.UsuarioCreadorNombre ?? "-")<br />
+                    @if (p.Anulado)
+                    {
+                        <text>Anulado por: @(p.UsuarioAnuladorNombre ?? "-")</text>
+                    }
+                </td>
+            }
+            <td>
+                @if (!p.Anulado)
+                {
+                    <a asp-action="Edit" asp-route-id="@p.IdPago">Editar concepto</a>
+                    @if (esAdmin)
+                    {
+                        <text> | <a asp-action="Delete" asp-route-id="@p.IdPago">Anular</a></text>
+                    }
+                }
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<h5>Cargar nuevo pago</h5>
+<form asp-action="Create" method="post" class="row g-2 align-items-end">
+    <input type="hidden" name="IdReserva" value="@reserva.IdReserva" />
+    <div class="col-auto">
+        <label class="form-label">Concepto</label>
+        <input name="Concepto" class="form-control" required />
+    </div>
+    <div class="col-auto">
+        <label class="form-label">Monto</label>
+        <input name="Monto" type="number" step="0.01" min="0.01" class="form-control" required />
+    </div>
+    <div class="col-auto">
+        <label class="form-label">Fecha</label>
+        <input name="Fecha" type="date" class="form-control" value="@DateTime.Today.ToString("yyyy-MM-dd")" required />
+    </div>
+    <div class="col-auto">
+        <input type="submit" value="Registrar pago" class="btn btn-primary" />
+    </div>
+</form>
+
+<div class="mt-3">
+    <a asp-controller="Reservas" asp-action="Details" asp-route-id="@reserva.IdReserva">Volver a la reserva</a>
+</div>

@@ -32,6 +32,7 @@
         <dd class="col-sm-9">@Model.Costo_Total.ToString("C")</dd>
     </dl>
 
+    <a asp-controller="Pagos" asp-action="Index" asp-route-idReserva="@Model.IdReserva" class="btn btn-success">Ver pagos</a>
     <a asp-action="Edit" asp-route-id="@Model.IdReserva" class="btn btn-primary">Editar</a>
     <a asp-action="Index" class="btn btn-secondary">Volver al listado</a>
 </div>
