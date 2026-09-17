@@ -50,5 +50,6 @@
     {
         <a asp-action="Finalizar" asp-route-id="@Model.IdReserva" class="btn btn-warning">Finalizar anticipadamente</a>
     }
+    <a asp-action="Create" asp-route-idInmueble="@Model.IdInmueble" asp-route-idInquilino="@Model.IdInquilino" asp-route-desde="@Model.Fecha_Hasta.ToString("yyyy-MM-dd")" class="btn btn-info">Renovar</a>
     <a asp-action="Index" class="btn btn-secondary">Volver al listado</a>
 </div>

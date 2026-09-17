@@ -61,13 +61,21 @@ public class ReservasController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> Create(int? idInmueble, DateTime? desde, DateTime? hasta)
+    public async Task<IActionResult> Create(int? idInmueble, int? idInquilino, DateTime? desde, DateTime? hasta)
     {
-        await CargarSelectAsync();
+        await CargarSelectAsync(idInmueble, idInquilino);
         var reserva = new Reserva();
         if (idInmueble.HasValue) reserva.IdInmueble = idInmueble.Value;
-        if (desde.HasValue) reserva.Fecha_Desde = desde.Value;
-        if (hasta.HasValue) reserva.Fecha_Hasta = hasta.Value;
+        if (idInquilino.HasValue) reserva.IdInquilino = idInquilino.Value;
+        if (desde.HasValue) {
+            reserva.Fecha_Desde = desde.Value;
+        }
+        else reserva.Fecha_Desde = DateTime.Today;
+        if (hasta.HasValue) {
+            reserva.Fecha_Hasta = hasta.Value;
+        }
+        else reserva.Fecha_Hasta = DateTime.Today.AddDays(1)
+        ;
         return View(reserva);
     }
 
