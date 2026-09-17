@@ -12,8 +12,10 @@
             <td>@i.Apellido</td>
             <td>@i.Email</td>
             <td>
-                <a asp-action="Edit" asp-route-id="@i.IdInquilino">Editar</a> |
-                <a asp-action="Delete" asp-route-id="@i.IdInquilino">Eliminar</a>
+                <a asp-action="Edit" asp-route-id="@i.IdInquilino" class="btn btn-sm btn-outline-primary">Editar</a>
+                @if (User.IsInRole("Administrador")) {
+                    <a asp-action="Delete" asp-route-id="@i.IdInquilino" class="btn btn-sm btn-outline-danger">Eliminar</a>
+                }
             </td>
         </tr>
     }

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
+[Authorize]
 public class ReservasController : Controller
 {
     private readonly IRepositorioReserva repositorio;
@@ -108,6 +109,7 @@ public class ReservasController : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    [Authorize(Policy = "Administrador")]
     public async Task<IActionResult> Delete(int id)
     {
         var reserva = await repositorio.ObtenerPorIdAsync(id);
@@ -115,7 +117,7 @@ public class ReservasController : Controller
         return View(reserva);
     }
 
-    [HttpPost, ActionName("Delete")]
+    [HttpPost, ActionName("Delete"), Authorize(Policy = "Administrador")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
@@ -123,7 +125,6 @@ public class ReservasController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    [Authorize]
     [HttpGet]
     public async Task<IActionResult> Finalizar(int id, DateTime? fechaFinalizacion = null)
     {
@@ -145,7 +146,6 @@ public class ReservasController : Controller
         return View(reserva);
     }
 
-    [Authorize]
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Finalizar(int id, DateTime fechaFinalizacion)
     {

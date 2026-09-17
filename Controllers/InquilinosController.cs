@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+[Authorize]
 public class InquilinosController : Controller
 {
 
@@ -47,6 +49,7 @@ public class InquilinosController : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    [Authorize(Policy = "Administrador")]
     public async Task<IActionResult> Delete(int id)
     {
         var inquilino = await repositorio.ObtenerPorIdAsync(id);
@@ -54,7 +57,7 @@ public class InquilinosController : Controller
         return View(inquilino);
     }
 
-    [HttpPost, ActionName("Delete")]
+    [HttpPost, ActionName("Delete"), Authorize(Policy = "Administrador")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {

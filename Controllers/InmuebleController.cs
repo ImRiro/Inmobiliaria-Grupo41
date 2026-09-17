@@ -1,6 +1,8 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
+[Authorize]
 public class InmueblesController : Controller
 {
     private readonly IRepositorioInmueble repositorio;
@@ -85,6 +87,7 @@ public class InmueblesController : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    [Authorize(Policy = "Administrador")]
     public async Task<IActionResult> Delete(int id)
     {
         var inmueble = await repositorio.ObtenerPorIdAsync(id);
@@ -92,7 +95,7 @@ public class InmueblesController : Controller
         return View(inmueble);
     }
 
-    [HttpPost, ActionName("Delete")]
+    [HttpPost, ActionName("Delete"), Authorize(Policy = "Administrador")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
