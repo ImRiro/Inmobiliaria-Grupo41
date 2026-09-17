@@ -128,4 +128,34 @@ public class RepositorioInmueble : RepositorioBase, IRepositorioInmueble
 
         await command.ExecuteNonQueryAsync();
     }
+
+    public async Task<List<Inmueble>> ObtenerDisponiblesAsync(DateTime desde, DateTime hasta, int? idTipoInmueble = null)
+{
+    var lista = new List<Inmueble>();
+
+    using var connection = new MySqlConnection(connectionString);
+    await connection.OpenAsync();
+
+    var query = SelectBase + @"
+        AND i.Disponible = 1
+        AND i.Id NOT IN (
+            SELECT r.IdInmueble FROM Reserva r
+            WHERE r.Fecha_Cancelacion IS NULL
+              AND r.Fecha_Desde < @Hasta
+              AND r.Fecha_Hasta > @Desde
+        )
+        AND (@IdTipoInmueble IS NULL OR i.IdTipoInmueble = @IdTipoInmueble)
+        ORDER BY i.Id";
+
+    using var command = new MySqlCommand(query, connection);
+    command.Parameters.AddWithValue("@Desde", desde.Date);
+    command.Parameters.AddWithValue("@Hasta", hasta.Date);
+    command.Parameters.AddWithValue("@IdTipoInmueble", (object?)idTipoInmueble ?? DBNull.Value);
+
+    using var reader = await command.ExecuteReaderAsync();
+    while (await reader.ReadAsync())
+        lista.Add(LeerInmueble(reader));
+
+    return lista;
+}
 }

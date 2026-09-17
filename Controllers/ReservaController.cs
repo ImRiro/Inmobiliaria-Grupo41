@@ -11,17 +11,20 @@ public class ReservasController : Controller
     private readonly IRepositorioInquilino repositorioInquilino;
     private readonly IConfiguration config;
     private readonly ILogger<ReservasController> logger;
+    private readonly IRepositorioTipoInmueble repositorioTipoInmueble;
 
     public ReservasController(
         IRepositorioReserva repo,
         IRepositorioInmueble repoInmueble,
         IRepositorioInquilino repoInquilino,
+        IRepositorioTipoInmueble repoTipoInmueble,
         IConfiguration config,
         ILogger<ReservasController> logger)
     {
         this.repositorio = repo;
         this.repositorioInmueble = repoInmueble;
         this.repositorioInquilino = repoInquilino;
+        this.repositorioTipoInmueble = repoTipoInmueble;
         this.config = config;
         this.logger = logger;
     }
@@ -42,12 +45,14 @@ public class ReservasController : Controller
         reserva.Costo_Total = dias * reserva.Monto_Diario;
     }
 
+    [HttpGet]
     public async Task<IActionResult> Index()
     {
         var reservas = await repositorio.ObtenerTodosAsync();
         return View(reservas);
     }
 
+    [HttpGet]
     public async Task<IActionResult> Details(int id)
     {
         var reserva = await repositorio.ObtenerPorIdAsync(id);
@@ -55,10 +60,15 @@ public class ReservasController : Controller
         return View(reserva);
     }
 
-    public async Task<IActionResult> Create()
+    [HttpGet]
+    public async Task<IActionResult> Create(int? idInmueble, DateTime? desde, DateTime? hasta)
     {
         await CargarSelectAsync();
-        return View();
+        var reserva = new Reserva();
+        if (idInmueble.HasValue) reserva.IdInmueble = idInmueble.Value;
+        if (desde.HasValue) reserva.Fecha_Desde = desde.Value;
+        if (hasta.HasValue) reserva.Fecha_Hasta = hasta.Value;
+        return View(reserva);
     }
 
     [HttpPost]
@@ -89,6 +99,7 @@ public class ReservasController : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    [HttpGet]
     public async Task<IActionResult> Edit(int id)
     {
         var reserva = await repositorio.ObtenerPorIdAsync(id);
@@ -200,5 +211,20 @@ public class ReservasController : Controller
     {
         var idClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
         return int.TryParse(idClaim, out var id) ? id : null;
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Disponibilidad(DateTime? desde, DateTime? hasta, int? idTipoInmueble)
+    {
+        ViewBag.TiposInmueble = new SelectList(await repositorioTipoInmueble.ObtenerTodosAsync(), "IdTipoInmueble", "Nombre", idTipoInmueble);
+
+        if (desde.HasValue && hasta.HasValue && hasta > desde)
+        {
+            ViewBag.Resultados = await repositorioInmueble.ObtenerDisponiblesAsync(desde.Value, hasta.Value, idTipoInmueble);
+            ViewBag.Desde = desde.Value;
+            ViewBag.Hasta = hasta.Value;
+        }
+
+        return View();
     }
 }

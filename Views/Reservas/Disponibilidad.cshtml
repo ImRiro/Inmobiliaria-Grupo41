@@ -1,0 +1,78 @@
+@{
+    ViewData["Title"] = "Buscar disponibilidad";
+    var desde = ViewBag.Desde as DateTime?;
+    var hasta = ViewBag.Hasta as DateTime?;
+    var resultados = ViewBag.Resultados as List<Inmueble>;
+}
+
+<h4>Buscar disponibilidad</h4>
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Disponibilidad" method="get">
+            <div class="form-group">
+                <label class="control-label">Desde</label>
+                <input type="date" name="desde" class="form-control" value="@(desde?.ToString("yyyy-MM-dd"))" />
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">Hasta</label>
+                <input type="date" name="hasta" class="form-control" value="@(hasta?.ToString("yyyy-MM-dd"))" />
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">Tipo de inmueble</label>
+                <select name="idTipoInmueble" class="form-control" asp-items="ViewBag.TiposInmueble">
+                    <option value="">-- Todos los tipos --</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Buscar" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@if (resultados != null)
+{
+    <hr />
+    <h5>Inmuebles disponibles (@resultados.Count)</h5>
+
+    @if (!resultados.Any())
+    {
+        <p class="text-muted">No hay inmuebles disponibles para esas fechas.</p>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Dirección</th>
+                    <th>Tipo</th>
+                    <th>Propietario</th>
+                    <th>Habitaciones</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var inmueble in resultados)
+                {
+                    <tr>
+                        <td>@inmueble.Direccion</td>
+                        <td>@inmueble.NombreTipoInmueble</td>
+                        <td>@inmueble.NombrePropietario</td>
+                        <td>@inmueble.Habitaciones</td>
+                        <td>
+                            <a asp-action="Create" asp-route-idInmueble="@inmueble.IdInmueble"
+                               asp-route-desde="@desde?.ToString("yyyy-MM-dd")"
+                               asp-route-hasta="@hasta?.ToString("yyyy-MM-dd")"
+                               class="btn btn-sm btn-outline-primary">Reservar</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}
