@@ -34,9 +34,10 @@ public class InmueblesController : Controller
         ViewBag.TiposInmueble = new SelectList(tipos, "IdTipoInmueble", "Nombre", idTipoSeleccionado);
     }
 
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(bool? disponible)
     {
-        var inmuebles = await repositorio.ObtenerTodosAsync();
+        var inmuebles = await repositorio.ObtenerTodosAsync(disponible);
+        ViewBag.Disponible = disponible;
         return View(inmuebles);
     }
 
