@@ -37,7 +37,7 @@ public class RepositorioInmueble : RepositorioBase, IRepositorioInmueble
         };
     }
 
-    public async Task<List<Inmueble>> ObtenerTodosAsync(bool? disponible = null)
+    public async Task<List<Inmueble>> ObtenerTodosAsync(bool? disponible = null, int? idPropietario = null)
     {
         var lista = new List<Inmueble>();
 
@@ -47,11 +47,15 @@ public class RepositorioInmueble : RepositorioBase, IRepositorioInmueble
         var query = SelectBase;
         if (disponible.HasValue)
             query += " AND i.Disponible = @Disponible";
+        if (idPropietario.HasValue)
+            query += " AND i.IdPropietario = @IdPropietario";
         query += " ORDER BY i.Id";
 
         using var command = new MySqlCommand(query, connection);
         if (disponible.HasValue)
             command.Parameters.AddWithValue("@Disponible", disponible.Value);
+        if (idPropietario.HasValue)
+            command.Parameters.AddWithValue("@IdPropietario", idPropietario.Value);
 
         using var reader = await command.ExecuteReaderAsync();
         while (await reader.ReadAsync())

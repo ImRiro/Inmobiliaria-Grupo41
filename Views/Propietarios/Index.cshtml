@@ -16,6 +16,7 @@
                 @if (User.IsInRole("Administrador")) {
                     <a asp-action="Delete" asp-route-id="@p.IdPropietario" class="btn btn-sm btn-outline-danger">Eliminar</a>
                 }
+                <a asp-controller="Inmuebles" asp-action="Index" asp-route-idPropietario="@p.IdPropietario" class="btn btn-sm btn-outline-secondary">Ver inmuebles</a>
             </td>
         </tr>
     }

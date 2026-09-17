@@ -34,10 +34,18 @@ public class InmueblesController : Controller
         ViewBag.TiposInmueble = new SelectList(tipos, "IdTipoInmueble", "Nombre", idTipoSeleccionado);
     }
 
-    public async Task<IActionResult> Index(bool? disponible)
+    public async Task<IActionResult> Index(bool? disponible, int? idPropietario)
     {
-        var inmuebles = await repositorio.ObtenerTodosAsync(disponible);
+        var inmuebles = await repositorio.ObtenerTodosAsync(disponible, idPropietario);
         ViewBag.Disponible = disponible;
+        ViewBag.IdPropietario = idPropietario;
+
+        if (idPropietario.HasValue)
+        {
+            var propietario = await repositorioPropietario.ObtenerPorIdAsync(idPropietario.Value);
+            ViewBag.NombrePropietario = propietario?.NombreCompleto;
+        }
+
         return View(inmuebles);
     }
 

@@ -6,6 +6,13 @@
 
 <h1>Inmuebles</h1>
 <a asp-action="Create" class="btn btn-primary">Nuevo</a>
+@if (ViewBag.IdPropietario != null)
+{
+    <div class="alert alert-info">
+        Mostrando inmuebles de: <strong>@ViewBag.NombrePropietario</strong>
+        <a asp-action="Index" class="float-end">Ver todos</a>
+    </div>
+}
 <form method="get" class="form-inline mb-3">
     <select name="disponible" class="form-control" onchange="this.form.submit()">
         <option value="">-- Todos --</option>
