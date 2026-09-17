@@ -1,0 +1,44 @@
+@model List<Inmueble>
+@{
+    ViewData["Title"] = "Inmuebles sin reservas";
+}
+
+<form asp-action="SinReservas" method="get">
+
+    <div class="form-group">
+        <label for="dias">Sin reservas en los últimos:</label>
+
+        <select name="dias" id="dias" class="form-control">
+            <option value="30" selected="@(ViewBag.Dias == 30)">30 días</option>
+            <option value="60" selected="@(ViewBag.Dias == 60)">60 días</option>
+            <option value="90" selected="@(ViewBag.Dias == 90)">90 días</option>
+            <option value="180" selected="@(ViewBag.Dias == 180)">180 días</option>
+            <option value="365" selected="@(ViewBag.Dias == 365)">365 días</option>
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        Buscar
+    </button>
+
+</form>
+
+<hr />
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Dirección</th>
+            <th>Propietario</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (Inmueble item in Model)
+        {
+            <tr>
+                <td>@item.Direccion</td>
+                <td>@item.NombrePropietario</td>
+            </tr>
+        }
+    </tbody>
+</table>

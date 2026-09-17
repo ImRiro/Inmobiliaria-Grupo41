@@ -18,4 +18,14 @@ public class InformesController : Controller
         var lista = await repositorioReserva.ObtenerMasReservadosAsync(dias);
         return View(lista);
     }
+
+    [HttpGet]
+    public async Task<IActionResult> SinReservas(int dias = 30)
+    {
+        ViewBag.Dias = dias;
+
+        var lista = await repositorioReserva.ObtenerSinReservasAsync(dias);
+
+        return View(lista);
+    }
 }

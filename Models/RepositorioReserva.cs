@@ -290,4 +290,39 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
 
         return lista;
     }
+
+    public async Task<List<Inmueble>> ObtenerSinReservasAsync(int dias = 30)
+    {
+        var lista = new List<Inmueble>();
+
+        using var connection = new MySqlConnection(connectionString);
+        await connection.OpenAsync();
+
+        var query = @"
+            SELECT i.Id, i.Direccion, CONCAT(p.Nombre, ' ', p.Apellido) AS NombrePropietario
+            FROM Inmueble i
+            INNER JOIN Propietarios p ON i.IdPropietario = p.Id
+            WHERE NOT EXISTS (
+                SELECT 1 FROM Reserva r
+                WHERE r.IdInmueble = i.Id
+                AND r.Fecha_Desde <= @FechaHasta
+                AND r.Fecha_Hasta >= @FechaDesde
+            )";
+
+        using var command = new MySqlCommand(query, connection);
+        command.Parameters.AddWithValue("@FechaHasta", DateTime.Today);
+        command.Parameters.AddWithValue("@FechaDesde", DateTime.Today.AddDays(-dias));
+        using var reader = await command.ExecuteReaderAsync();
+        while (await reader.ReadAsync())
+        {
+            lista.Add(new Inmueble
+            {
+                IdInmueble = reader.GetInt32(reader.GetOrdinal("Id")),
+                Direccion = reader.GetString(reader.GetOrdinal("Direccion")),
+                NombrePropietario = reader.GetString(reader.GetOrdinal("NombrePropietario"))
+            });
+        }
+
+        return lista;
+    }
 }
