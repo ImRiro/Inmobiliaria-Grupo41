@@ -31,8 +31,8 @@
         <dt class="col-sm-3">Longitud</dt>
         <dd class="col-sm-9">@(Model.Longitud.ToString() ?? "-")</dd>
 
-        <dt class="col-sm-3">Activo</dt>
-        <dd class="col-sm-9">@(Model.Activo ? "Sí" : "No")</dd>
+        <dt class="col-sm-3">Disponible</dt>
+        <dd class="col-sm-9">@(Model.Disponible ? "Sí" : "No")</dd>
     </dl>
 
     <a asp-action="Edit" asp-route-id="@Model.IdInmueble" class="btn btn-primary">Editar</a>

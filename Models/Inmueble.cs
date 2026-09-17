@@ -27,9 +27,11 @@ public class Inmueble
     [Display(Name = "Longitud")]
     public decimal Longitud { get; set; } = 0;
 
-    [Required]
-    [Display(Name = "Activo")]
     public bool Activo { get; set; } = false;
+
+    [Required]
+    [Display(Name = "Disponible")]
+    public bool Disponible { get; set; } = false;
 
     [Required]
     [Range(0, int.MaxValue, ErrorMessage = "Las habitaciones no pueden ser negativas")]
