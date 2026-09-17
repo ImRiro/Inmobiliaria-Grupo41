@@ -9,7 +9,7 @@ public class RepositorioInmueble : RepositorioBase, IRepositorioInmueble
     }
     
     private const string SelectBase = @"
-        SELECT i.Id, i.IdPropietario, i.IdTipoInmueble, i.Direccion, i.Latitud, i.Longitud,
+        SELECT i.Id, i.IdPropietario, i.IdTipoInmueble, i.Direccion, i.Latitud, i.Longitud, i.Porcentaje_Sena,
                i.Disponible, i.Metros_Cuadrados, i.Habitaciones,
                CONCAT(p.Nombre, ' ', p.Apellido) AS NombrePropietario,
                t.Nombre AS NombreTipoInmueble
@@ -28,6 +28,7 @@ public class RepositorioInmueble : RepositorioBase, IRepositorioInmueble
             Direccion = reader.GetString(reader.GetOrdinal("Direccion")),
             Latitud = reader.GetDecimal(reader.GetOrdinal("Latitud")),
             Longitud = reader.GetDecimal(reader.GetOrdinal("Longitud")),
+            Porcentaje_Sena = reader.GetDecimal(reader.GetOrdinal("Porcentaje_Sena")),
             Disponible = reader.GetBoolean(reader.GetOrdinal("Disponible")),
             Metros_Cuadrados = reader.GetInt32(reader.GetOrdinal("Metros_Cuadrados")),
             Habitaciones = reader.GetInt32(reader.GetOrdinal("Habitaciones")),
@@ -77,14 +78,15 @@ public class RepositorioInmueble : RepositorioBase, IRepositorioInmueble
         using var connection = new MySqlConnection(connectionString);
         await connection.OpenAsync();
 
-        var query = @"INSERT INTO Inmueble (IdPropietario, IdTipoInmueble, Direccion, Latitud, Longitud, Disponible, Metros_Cuadrados, Habitaciones)
-                      VALUES (@IdPropietario, @IdTipoInmueble, @Direccion, @Latitud, @Longitud, @Disponible, @Metros_Cuadrados, @Habitaciones)";
+        var query = @"INSERT INTO Inmueble (IdPropietario, IdTipoInmueble, Direccion, Latitud, Longitud, Porcentaje_Sena, Disponible, Metros_Cuadrados, Habitaciones)
+                      VALUES (@IdPropietario, @IdTipoInmueble, @Direccion, @Latitud, @Longitud, @Porcentaje_Sena, @Disponible, @Metros_Cuadrados, @Habitaciones)";
         using var command = new MySqlCommand(query, connection);
         command.Parameters.AddWithValue("@IdPropietario", inmueble.IdPropietario);
         command.Parameters.AddWithValue("@IdTipoInmueble", inmueble.IdTipoInmueble);
         command.Parameters.AddWithValue("@Direccion", inmueble.Direccion);
         command.Parameters.AddWithValue("@Latitud", inmueble.Latitud);
         command.Parameters.AddWithValue("@Longitud", inmueble.Longitud);
+        command.Parameters.AddWithValue("@Porcentaje_Sena", inmueble.Porcentaje_Sena);
         command.Parameters.AddWithValue("@Disponible", inmueble.Disponible);
         command.Parameters.AddWithValue("@Metros_Cuadrados", inmueble.Metros_Cuadrados);
         command.Parameters.AddWithValue("@Habitaciones", inmueble.Habitaciones);
@@ -98,7 +100,7 @@ public class RepositorioInmueble : RepositorioBase, IRepositorioInmueble
         await connection.OpenAsync();
 
         var query = @"UPDATE Inmueble SET IdPropietario = @IdPropietario, IdTipoInmueble = @IdTipoInmueble, Direccion = @Direccion, 
-                      Latitud = @Latitud, Longitud = @Longitud, Disponible = @Disponible, Metros_Cuadrados = @Metros_Cuadrados, 
+                      Latitud = @Latitud, Longitud = @Longitud, Porcentaje_Sena = @Porcentaje_Sena, Disponible = @Disponible, Metros_Cuadrados = @Metros_Cuadrados, 
                       Habitaciones = @Habitaciones WHERE Id = @IdInmueble";
         using var command = new MySqlCommand(query, connection);
         command.Parameters.AddWithValue("@IdInmueble", inmueble.IdInmueble);
@@ -107,6 +109,7 @@ public class RepositorioInmueble : RepositorioBase, IRepositorioInmueble
         command.Parameters.AddWithValue("@Direccion", inmueble.Direccion);
         command.Parameters.AddWithValue("@Latitud", inmueble.Latitud);
         command.Parameters.AddWithValue("@Longitud", inmueble.Longitud);
+        command.Parameters.AddWithValue("@Porcentaje_Sena", inmueble.Porcentaje_Sena);
         command.Parameters.AddWithValue("@Disponible", inmueble.Disponible);
         command.Parameters.AddWithValue("@Metros_Cuadrados", inmueble.Metros_Cuadrados);
         command.Parameters.AddWithValue("@Habitaciones", inmueble.Habitaciones);

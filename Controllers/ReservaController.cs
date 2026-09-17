@@ -76,9 +76,11 @@ public class ReservasController : Controller
             return View(reserva);
         }
 
+        int? idUsuario = ObtenerIdUsuarioActual();
+
         reserva.IdUsuarioCreador = ObtenerIdUsuarioActual();
         CalcularCostoTotal(reserva);
-        await repositorio.CrearAsync(reserva);
+        await repositorio.CrearAsync(reserva, idUsuario);
         return RedirectToAction(nameof(Index));
     }
 

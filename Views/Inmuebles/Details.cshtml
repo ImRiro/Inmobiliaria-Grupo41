@@ -31,6 +31,9 @@
         <dt class="col-sm-3">Longitud</dt>
         <dd class="col-sm-9">@(Model.Longitud.ToString() ?? "-")</dd>
 
+        <dt class="col-sm-3">Porcentaje de Seña</dt>
+        <dd class="col-sm-9">@Model.Porcentaje_Sena.ToString("0.##")%</dd>
+
         <dt class="col-sm-3">Disponible</dt>
         <dd class="col-sm-9">@(Model.Disponible ? "Sí" : "No")</dd>
     </dl>

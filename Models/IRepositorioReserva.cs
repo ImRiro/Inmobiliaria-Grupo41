@@ -2,7 +2,7 @@ public interface IRepositorioReserva
 {
     Task<List<Reserva>> ObtenerTodosAsync();
     Task<Reserva?> ObtenerPorIdAsync(int id);
-    Task CrearAsync(Reserva reserva);
+    Task CrearAsync(Reserva reserva, int? idUsuario);
     Task ActualizarAsync(Reserva reserva);
     Task EliminarAsync(int id);
 

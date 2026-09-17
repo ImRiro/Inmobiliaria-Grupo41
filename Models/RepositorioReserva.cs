@@ -78,24 +78,83 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
         return null;
     }
 
-    public async Task CrearAsync(Reserva reserva)
+    public async Task CrearAsync(Reserva reserva, int? idUsuario)
     {
         using var connection = new MySqlConnection(connectionString);
         await connection.OpenAsync();
 
-        var query = @"INSERT INTO Reserva (IdInmueble, IdInquilino, Fecha_Desde, Fecha_Hasta, Fecha_Cancelacion, Monto_Diario, Costo_Total, IdUsuarioCreador)
-                      VALUES (@IdInmueble, @IdInquilino, @Fecha_Desde, @Fecha_Hasta, @Fecha_Cancelacion, @Monto_Diario, @Costo_Total, @IdUsuarioCreador)";
-        using var command = new MySqlCommand(query, connection);
-        command.Parameters.AddWithValue("@IdInmueble", reserva.IdInmueble);
-        command.Parameters.AddWithValue("@IdInquilino", reserva.IdInquilino);
-        command.Parameters.AddWithValue("@Fecha_Desde", reserva.Fecha_Desde);
-        command.Parameters.AddWithValue("@Fecha_Hasta", reserva.Fecha_Hasta);
-        command.Parameters.AddWithValue("@Fecha_Cancelacion", reserva.Fecha_Cancelacion == DateTime.MinValue ? (object)DBNull.Value : reserva.Fecha_Cancelacion);
-        command.Parameters.AddWithValue("@Monto_Diario", reserva.Monto_Diario);
-        command.Parameters.AddWithValue("@Costo_Total", reserva.Costo_Total);
-        command.Parameters.AddWithValue("@IdUsuarioCreador", reserva.IdUsuarioCreador);
+        using var transaction = await connection.BeginTransactionAsync();
 
-        await command.ExecuteNonQueryAsync();
+        try
+        {
+            const string queryPorcentajeSena = @"SELECT Porcentaje_Sena FROM Inmueble WHERE Id = @IdInmueble AND Activo = 1";
+
+            decimal porcentajeSena;
+
+            using (var command = new MySqlCommand(queryPorcentajeSena, connection, transaction))
+            {
+                command.Parameters.AddWithValue("@IdInmueble", reserva.IdInmueble);
+                var result = await command.ExecuteScalarAsync();
+                if (result == null || result == DBNull.Value)
+                {
+                    throw new InvalidOperationException("El inmueble no existe o no está activo.");
+                }
+                porcentajeSena = Convert.ToDecimal(result);
+            }
+
+            decimal montoSena = Math.Round(reserva.Costo_Total * porcentajeSena / 100m, 2);
+            var reservaQuery = @"INSERT INTO Reserva (IdInmueble, IdInquilino, Fecha_Desde, Fecha_Hasta, Fecha_Cancelacion, Monto_Diario, Costo_Total, IdUsuarioCreador) VALUES (@IdInmueble, @IdInquilino, @Fecha_Desde, @Fecha_Hasta, @Fecha_Cancelacion, @Monto_Diario, @Costo_Total, @IdUsuarioCreador); SELECT LAST_INSERT_ID();";
+
+            int idReserva;
+
+            using (var command = new MySqlCommand(reservaQuery, connection, transaction))
+            {
+                command.Parameters.AddWithValue("@IdInmueble", reserva.IdInmueble);
+                command.Parameters.AddWithValue("@IdInquilino", reserva.IdInquilino);
+                command.Parameters.AddWithValue("@Fecha_Desde", reserva.Fecha_Desde);
+                command.Parameters.AddWithValue("@Fecha_Hasta", reserva.Fecha_Hasta);
+                command.Parameters.AddWithValue("@Fecha_Cancelacion", reserva.Fecha_Cancelacion == DateTime.MinValue ? (object)DBNull.Value : reserva.Fecha_Cancelacion);
+                command.Parameters.AddWithValue("@Monto_Diario", reserva.Monto_Diario);
+                command.Parameters.AddWithValue("@Costo_Total", reserva.Costo_Total);
+                command.Parameters.AddWithValue("@IdUsuarioCreador", reserva.IdUsuarioCreador);
+
+                idReserva = Convert.ToInt32(await command.ExecuteScalarAsync());
+            }
+
+            var queryPago = @"INSERT INTO pago (idreserva, concepto, monto, fecha, anulado, idusuariocreador)
+                              VALUES (@IdReserva, @Concepto, @Monto, @Fecha, 0, @IdUsuarioCreador)";
+            using (var cmdPago = new MySqlCommand(queryPago, connection, transaction))
+            {
+                cmdPago.Parameters.AddWithValue("@IdReserva", idReserva);
+                cmdPago.Parameters.AddWithValue("@Concepto", "Seña de reserva");
+                cmdPago.Parameters.AddWithValue("@Monto", montoSena);
+                cmdPago.Parameters.AddWithValue("@Fecha", DateTime.Today);
+                cmdPago.Parameters.AddWithValue("@IdUsuarioCreador", (object?)idUsuario ?? DBNull.Value);
+                await cmdPago.ExecuteNonQueryAsync();
+            }
+
+            await transaction.CommitAsync();
+
+        }
+        catch (System.Exception)
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
+
+        // var query = @"INSERT INTO Reserva (IdInmueble, IdInquilino, Fecha_Desde, Fecha_Hasta, Fecha_Cancelacion, Monto_Diario, Costo_Total, IdUsuarioCreador)
+        //               VALUES (@IdInmueble, @IdInquilino, @Fecha_Desde, @Fecha_Hasta, @Fecha_Cancelacion, @Monto_Diario, @Costo_Total, @IdUsuarioCreador)";
+        // using var command = new MySqlCommand(query, connection);
+        // command.Parameters.AddWithValue("@IdInmueble", reserva.IdInmueble);
+        // command.Parameters.AddWithValue("@IdInquilino", reserva.IdInquilino);
+        // command.Parameters.AddWithValue("@Fecha_Desde", reserva.Fecha_Desde);
+        // command.Parameters.AddWithValue("@Fecha_Hasta", reserva.Fecha_Hasta);
+        // command.Parameters.AddWithValue("@Fecha_Cancelacion", reserva.Fecha_Cancelacion == DateTime.MinValue ? (object)DBNull.Value : reserva.Fecha_Cancelacion);
+        // command.Parameters.AddWithValue("@Monto_Diario", reserva.Monto_Diario);
+        // command.Parameters.AddWithValue("@Costo_Total", reserva.Costo_Total);
+        // command.Parameters.AddWithValue("@IdUsuarioCreador", reserva.IdUsuarioCreador);
+
+        // await command.ExecuteNonQueryAsync();
     }
 
     public async Task ActualizarAsync(Reserva reserva)

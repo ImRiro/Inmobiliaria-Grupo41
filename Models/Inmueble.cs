@@ -43,6 +43,10 @@ public class Inmueble
     [Display(Name = "Metros Cuadrados")]
     public decimal Metros_Cuadrados { get; set; } = 0;
 
+    [Required]
+    [Range(0, 100, ErrorMessage = "El porcentaje de la seña debe estar entre 0 y 100")]
+    [Display(Name = "Porcentaje Seña")]
+    public decimal Porcentaje_Sena { get; set; } = 0;
 
     [Display(Name = "Propietario")]
     public string? NombrePropietario { get; set; }
