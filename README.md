@@ -3,17 +3,17 @@
 ## Integrantes:
 - Ramiro Romero
 - Nicolas Bustamante
+## Admin
+- email: admin@inmobiliaria.com
+- contraseña: Admin123!
 ## Diagramas
 
 (Estado actual del proyecto, seran ampliados a medida que el scope crezca)
 
-### Casos de Uso
-https://www.figma.com/files/team/1614361052615337445/project/639110759?fuid=1614361051090803016
-
 ### Entidad Relacion
 <img width="1031" height="771" alt="Inmobiliaria Lab 2 - Romero Bustamante drawio" src="https://github.com/user-attachments/assets/2ee4bee5-3ee8-498b-85e8-c5876df6a3a0" />
 
-### Instrucciones SQL
+## Instrucciones SQL
 
 1. Abrir MySQL y conectarse al servidor local (localhost:3306).
 2. Ejecutar el script "Inmobiliaria-lab2-RomeroBustamante.sql" incluido en este repositorio
