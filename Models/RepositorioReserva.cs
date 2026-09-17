@@ -10,12 +10,16 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
 
     private const string SelectBase = @"
         SELECT r.Id, r.IdInmueble, r.IdInquilino, r.Fecha_Desde, r.Fecha_Hasta, r.Fecha_Cancelacion,
-               r.Monto_Diario, r.Costo_Total,
-               inm.Direccion AS DireccionInmueble,
-               CONCAT(q.Nombre, ' ', q.Apellido) AS NombreInquilino
+                r.Monto_Diario, r.Costo_Total, r.IdUsuarioCreador, r.IdUsuarioFinalizador,
+                inm.Direccion AS DireccionInmueble,
+                CONCAT(q.Nombre, ' ', q.Apellido) AS NombreInquilino,
+                cu.Nombre AS CreadorNombre, cu.Apellido AS CreadorApellido,
+                fu.Nombre AS FinalizadorNombre, fu.Apellido AS FinalizadorApellido
         FROM Reserva r
         INNER JOIN Inmueble inm ON r.IdInmueble = inm.Id
-        INNER JOIN Inquilinos q ON r.IdInquilino = q.Id";
+        INNER JOIN Inquilinos q ON r.IdInquilino = q.Id
+        LEFT JOIN Usuario cu ON r.IdUsuarioCreador = cu.Id
+        LEFT JOIN Usuario fu ON r.IdUsuarioFinalizador = fu.Id";
 
     private static Reserva LeerReserva(MySqlDataReader reader)
     {
@@ -30,7 +34,11 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
             Monto_Diario = reader.GetDecimal(reader.GetOrdinal("Monto_Diario")),
             Costo_Total = reader.GetDecimal(reader.GetOrdinal("Costo_Total")),
             DireccionInmueble = reader.GetString(reader.GetOrdinal("DireccionInmueble")),
-            NombreInquilino = reader.GetString(reader.GetOrdinal("NombreInquilino"))
+            NombreInquilino = reader.GetString(reader.GetOrdinal("NombreInquilino")),
+            IdUsuarioCreador = reader.IsDBNull(reader.GetOrdinal("IdUsuarioCreador")) ? null : reader.GetInt32(reader.GetOrdinal("IdUsuarioCreador")),
+            IdUsuarioFinalizador = reader.IsDBNull(reader.GetOrdinal("IdUsuarioFinalizador")) ? null : reader.GetInt32(reader.GetOrdinal("IdUsuarioFinalizador")),
+            UsuarioCreadorNombre = reader.IsDBNull(reader.GetOrdinal("CreadorNombre")) ? null : $"{reader.GetString(reader.GetOrdinal("CreadorNombre"))} {reader.GetString(reader.GetOrdinal("CreadorApellido"))}",
+            UsuarioFinalizadorNombre = reader.IsDBNull(reader.GetOrdinal("FinalizadorNombre")) ? null : $"{reader.GetString(reader.GetOrdinal("FinalizadorNombre"))} {reader.GetString(reader.GetOrdinal("FinalizadorApellido"))}"
         };
     }
 
@@ -75,8 +83,8 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
         using var connection = new MySqlConnection(connectionString);
         await connection.OpenAsync();
 
-        var query = @"INSERT INTO Reserva (IdInmueble, IdInquilino, Fecha_Desde, Fecha_Hasta, Fecha_Cancelacion, Monto_Diario, Costo_Total)
-                      VALUES (@IdInmueble, @IdInquilino, @Fecha_Desde, @Fecha_Hasta, @Fecha_Cancelacion, @Monto_Diario, @Costo_Total)";
+        var query = @"INSERT INTO Reserva (IdInmueble, IdInquilino, Fecha_Desde, Fecha_Hasta, Fecha_Cancelacion, Monto_Diario, Costo_Total, IdUsuarioCreador)
+                      VALUES (@IdInmueble, @IdInquilino, @Fecha_Desde, @Fecha_Hasta, @Fecha_Cancelacion, @Monto_Diario, @Costo_Total, @IdUsuarioCreador)";
         using var command = new MySqlCommand(query, connection);
         command.Parameters.AddWithValue("@IdInmueble", reserva.IdInmueble);
         command.Parameters.AddWithValue("@IdInquilino", reserva.IdInquilino);
@@ -85,6 +93,7 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
         command.Parameters.AddWithValue("@Fecha_Cancelacion", reserva.Fecha_Cancelacion == DateTime.MinValue ? (object)DBNull.Value : reserva.Fecha_Cancelacion);
         command.Parameters.AddWithValue("@Monto_Diario", reserva.Monto_Diario);
         command.Parameters.AddWithValue("@Costo_Total", reserva.Costo_Total);
+        command.Parameters.AddWithValue("@IdUsuarioCreador", reserva.IdUsuarioCreador);
 
         await command.ExecuteNonQueryAsync();
     }
@@ -122,7 +131,7 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
         await command.ExecuteNonQueryAsync();
     }
 
-    public async Task FinalizarConMultaAsync(int idReserva, DateTime fechaFinalizacion, decimal montoMulta, int? idUsuarioCreadorPago)
+    public async Task FinalizarConMultaAsync(int idReserva, DateTime fechaFinalizacion, decimal montoMulta, int? idUsuario)
     {
         using var connection = new MySqlConnection(connectionString);
         await connection.OpenAsync();
@@ -130,11 +139,12 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
 
         try
         {
-            var queryReserva = "UPDATE Reserva SET Fecha_Cancelacion = @Fecha WHERE Id = @Id AND Fecha_Cancelacion IS NULL";
+            var queryReserva = "UPDATE Reserva SET Fecha_Cancelacion = @Fecha AND IdUsuarioAnulador = @IdUsuario WHERE Id = @Id AND Fecha_Cancelacion IS NULL";
             using (var cmdReserva = new MySqlCommand(queryReserva, connection, transaction))
             {
                 cmdReserva.Parameters.AddWithValue("@Id", idReserva);
                 cmdReserva.Parameters.AddWithValue("@Fecha", fechaFinalizacion);
+                cmdReserva.Parameters.AddWithValue("@IdUsuario", idUsuario);
                 var filasAfectadas = await cmdReserva.ExecuteNonQueryAsync();
                 if (filasAfectadas == 0)
                 {
@@ -150,7 +160,7 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
                 cmdPago.Parameters.AddWithValue("@Concepto", "Multa por cancelación anticipada");
                 cmdPago.Parameters.AddWithValue("@Monto", montoMulta);
                 cmdPago.Parameters.AddWithValue("@Fecha", fechaFinalizacion);
-                cmdPago.Parameters.AddWithValue("@IdUsuarioCreador", (object?)idUsuarioCreadorPago ?? DBNull.Value);
+                cmdPago.Parameters.AddWithValue("@IdUsuarioCreador", (object?)idUsuario ?? DBNull.Value);
                 await cmdPago.ExecuteNonQueryAsync();
             }
 

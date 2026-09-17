@@ -8,7 +8,6 @@ public class RepositorioPago : RepositorioBase, IRepositorioPago
 
     }
 
-    // LEFT JOIN a usuario (creador/anulador) porque pueden ser NULL (pago viejo sin auditoría, o nunca anulado)
     private const string SelectBase = @"
         SELECT p.Id, p.idreserva, p.concepto, p.monto, p.fecha, p.anulado, p.fecha_anulacion,
                p.idusuariocreador, p.idusuarioanulador,

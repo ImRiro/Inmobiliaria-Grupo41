@@ -30,6 +30,18 @@
 
         <dt class="col-sm-3">Costo total</dt>
         <dd class="col-sm-9">@Model.Costo_Total.ToString("C")</dd>
+
+        @if (User.IsInRole("Administrador"))
+        {
+            <dt class="col-sm-3">Creado por</dt>
+            <dd class="col-sm-9">@(Model.UsuarioCreadorNombre ?? "-")</dd>
+
+            @if (Model.Fecha_Cancelacion.HasValue)
+            {
+                <dt class="col-sm-3">Anulado por</dt>
+                <dd class="col-sm-9">@(Model.UsuarioFinalizadorNombre ?? "-")</dd>
+            }
+        }
     </dl>
 
     <a asp-controller="Pagos" asp-action="Index" asp-route-idReserva="@Model.IdReserva" class="btn btn-success">Ver pagos</a>

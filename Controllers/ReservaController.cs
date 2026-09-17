@@ -76,6 +76,7 @@ public class ReservasController : Controller
             return View(reserva);
         }
 
+        reserva.IdUsuarioCreador = ObtenerIdUsuarioActual();
         CalcularCostoTotal(reserva);
         await repositorio.CrearAsync(reserva);
         return RedirectToAction(nameof(Index));
@@ -168,8 +169,7 @@ public class ReservasController : Controller
 
         var calculo = reserva.CalcularMulta(fechaFinalizacion.Date);
 
-        var idClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        int? idUsuario = int.TryParse(idClaim, out var idParsed) ? idParsed : null;
+        int? idUsuario = ObtenerIdUsuarioActual();
 
         try
         {
@@ -183,5 +183,11 @@ public class ReservasController : Controller
 
         TempData["Mensaje"] = $"Reserva finalizada anticipadamente. Se registró una multa de {calculo.Monto:C} ({calculo.Porcentaje:P0} de {calculo.DiasRestantes} día(s) restante(s)).";
         return RedirectToAction("Index", "Pagos", new { idReserva = id });
+    }
+
+        private int? ObtenerIdUsuarioActual()
+    {
+        var idClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        return int.TryParse(idClaim, out var id) ? id : null;
     }
 }

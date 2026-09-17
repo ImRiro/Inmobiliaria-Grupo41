@@ -34,6 +34,15 @@ public class Reserva
     [Display(Name = "Inquilino")]
     public string? NombreInquilino { get; set; }
 
+    public int? IdUsuarioCreador { get; set; }
+    public int? IdUsuarioFinalizador { get; set; }
+    
+    [NotMapped, Display(Name = "Creado por")]
+    public string? UsuarioCreadorNombre { get; set; }
+
+    [NotMapped, Display(Name = "Anulado por")]
+    public string? UsuarioFinalizadorNombre { get; set; }
+
     // "Si se cumplió menos de la mitad del tiempo original de alquiler, deberá pagar
     //  el 50% restante de alquiler. Caso contrario, sólo 25%."
     public ResultadoMulta CalcularMulta(DateTime fechaFinalizacion)
