@@ -5,4 +5,6 @@ public interface IRepositorioReserva
     Task CrearAsync(Reserva reserva);
     Task ActualizarAsync(Reserva reserva);
     Task EliminarAsync(int id);
+
+    Task FinalizarConMultaAsync(int idReserva, DateTime fechaFinalizacion, decimal montoMulta, int? idUsuarioCreadorPago);
 }

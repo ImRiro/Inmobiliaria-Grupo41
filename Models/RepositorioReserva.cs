@@ -121,4 +121,45 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
 
         await command.ExecuteNonQueryAsync();
     }
+
+    public async Task FinalizarConMultaAsync(int idReserva, DateTime fechaFinalizacion, decimal montoMulta, int? idUsuarioCreadorPago)
+    {
+        using var connection = new MySqlConnection(connectionString);
+        await connection.OpenAsync();
+        using var transaction = await connection.BeginTransactionAsync();
+
+        try
+        {
+            var queryReserva = "UPDATE Reserva SET Fecha_Cancelacion = @Fecha WHERE Id = @Id AND Fecha_Cancelacion IS NULL";
+            using (var cmdReserva = new MySqlCommand(queryReserva, connection, transaction))
+            {
+                cmdReserva.Parameters.AddWithValue("@Id", idReserva);
+                cmdReserva.Parameters.AddWithValue("@Fecha", fechaFinalizacion);
+                var filasAfectadas = await cmdReserva.ExecuteNonQueryAsync();
+                if (filasAfectadas == 0)
+                {
+                    throw new InvalidOperationException("La reserva no existe o ya había sido finalizada anteriormente.");
+                }
+            }
+
+            var queryPago = @"INSERT INTO pago (idreserva, concepto, monto, fecha, anulado, idusuariocreador)
+                              VALUES (@IdReserva, @Concepto, @Monto, @Fecha, 0, @IdUsuarioCreador)";
+            using (var cmdPago = new MySqlCommand(queryPago, connection, transaction))
+            {
+                cmdPago.Parameters.AddWithValue("@IdReserva", idReserva);
+                cmdPago.Parameters.AddWithValue("@Concepto", "Multa por cancelación anticipada");
+                cmdPago.Parameters.AddWithValue("@Monto", montoMulta);
+                cmdPago.Parameters.AddWithValue("@Fecha", fechaFinalizacion);
+                cmdPago.Parameters.AddWithValue("@IdUsuarioCreador", (object?)idUsuarioCreadorPago ?? DBNull.Value);
+                await cmdPago.ExecuteNonQueryAsync();
+            }
+
+            await transaction.CommitAsync();
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
+    }
 }

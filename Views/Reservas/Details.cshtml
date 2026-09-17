@@ -34,5 +34,9 @@
 
     <a asp-controller="Pagos" asp-action="Index" asp-route-idReserva="@Model.IdReserva" class="btn btn-success">Ver pagos</a>
     <a asp-action="Edit" asp-route-id="@Model.IdReserva" class="btn btn-primary">Editar</a>
+    @if (!Model.Fecha_Cancelacion.HasValue)
+    {
+        <a asp-action="Finalizar" asp-route-id="@Model.IdReserva" class="btn btn-warning">Finalizar anticipadamente</a>
+    }
     <a asp-action="Index" class="btn btn-secondary">Volver al listado</a>
 </div>

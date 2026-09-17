@@ -1,3 +1,5 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -119,5 +121,67 @@ public class ReservasController : Controller
     {
         await repositorio.EliminarAsync(id);
         return RedirectToAction(nameof(Index));
+    }
+
+    [Authorize]
+    [HttpGet]
+    public async Task<IActionResult> Finalizar(int id, DateTime? fechaFinalizacion = null)
+    {
+        var reserva = await repositorio.ObtenerPorIdAsync(id);
+        if (reserva == null) return NotFound();
+
+        if (reserva.Fecha_Cancelacion.HasValue)
+        {
+            TempData["Error"] = "Esta reserva ya fue finalizada anticipadamente.";
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
+        var fechaPropuesta = fechaFinalizacion?.Date ?? DateTime.Today;
+        if (fechaPropuesta < reserva.Fecha_Desde.Date) fechaPropuesta = reserva.Fecha_Desde.Date;
+        if (fechaPropuesta > reserva.Fecha_Hasta.Date) fechaPropuesta = reserva.Fecha_Hasta.Date;
+
+        ViewBag.FechaFinalizacion = fechaPropuesta;
+        ViewBag.Calculo = reserva.CalcularMulta(fechaPropuesta);
+        return View(reserva);
+    }
+
+    [Authorize]
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> Finalizar(int id, DateTime fechaFinalizacion)
+    {
+        var reserva = await repositorio.ObtenerPorIdAsync(id);
+        if (reserva == null) return NotFound();
+
+        if (reserva.Fecha_Cancelacion.HasValue)
+        {
+            TempData["Error"] = "Esta reserva ya fue finalizada anticipadamente.";
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
+        if (fechaFinalizacion.Date < reserva.Fecha_Desde.Date || fechaFinalizacion.Date > reserva.Fecha_Hasta.Date)
+        {
+            ModelState.AddModelError(string.Empty, "La fecha de finalización debe estar dentro del período original de la reserva.");
+            ViewBag.FechaFinalizacion = fechaFinalizacion.Date;
+            ViewBag.Calculo = reserva.CalcularMulta(fechaFinalizacion.Date);
+            return View(reserva);
+        }
+
+        var calculo = reserva.CalcularMulta(fechaFinalizacion.Date);
+
+        var idClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        int? idUsuario = int.TryParse(idClaim, out var idParsed) ? idParsed : null;
+
+        try
+        {
+            await repositorio.FinalizarConMultaAsync(id, fechaFinalizacion.Date, calculo.Monto, idUsuario);
+        }
+        catch (InvalidOperationException ex)
+        {
+            TempData["Error"] = ex.Message;
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
+        TempData["Mensaje"] = $"Reserva finalizada anticipadamente. Se registró una multa de {calculo.Monto:C} ({calculo.Porcentaje:P0} de {calculo.DiasRestantes} día(s) restante(s)).";
+        return RedirectToAction("Index", "Pagos", new { idReserva = id });
     }
 }

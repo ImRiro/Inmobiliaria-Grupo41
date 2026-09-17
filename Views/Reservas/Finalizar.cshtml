@@ -1,0 +1,55 @@
+@model Reserva
+@{
+    ViewData["Title"] = "Finalizar reserva anticipadamente";
+    var fechaFinalizacion = (DateTime)ViewBag.FechaFinalizacion;
+    var calculo = (ResultadoMulta)ViewBag.Calculo;
+}
+
+<h4>Finalizar reserva #@Model.IdReserva anticipadamente</h4>
+<hr />
+
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+<dl class="row">
+    <dt class="col-sm-3">Inmueble</dt>
+    <dd class="col-sm-9">@Model.DireccionInmueble</dd>
+    <dt class="col-sm-3">Inquilino</dt>
+    <dd class="col-sm-9">@Model.NombreInquilino</dd>
+    <dt class="col-sm-3">Período original</dt>
+    <dd class="col-sm-9">@Model.Fecha_Desde.ToString("dd/MM/yyyy") - @Model.Fecha_Hasta.ToString("dd/MM/yyyy")</dd>
+    <dt class="col-sm-3">Monto por día</dt>
+    <dd class="col-sm-9">@Model.Monto_Diario.ToString("C")</dd>
+</dl>
+
+<form asp-action="Finalizar" method="post" id="formFinalizar">
+    <input type="hidden" name="id" value="@Model.IdReserva" />
+
+    <div class="form-group mb-3" style="max-width: 250px;">
+        <label>Fecha en que se hace efectiva la finalización</label>
+        <input type="date" name="fechaFinalizacion" class="form-control"
+               value="@fechaFinalizacion.ToString("yyyy-MM-dd")"
+               min="@Model.Fecha_Desde.ToString("yyyy-MM-dd")"
+               max="@Model.Fecha_Hasta.ToString("yyyy-MM-dd")"
+               onchange="window.location.href = '@Url.Action("Finalizar", new { id = Model.IdReserva })' + '?fechaFinalizacion=' + this.value" />
+        <small class="text-muted">La fecha de fin original (@Model.Fecha_Hasta.ToString("dd/MM/yyyy")) no se pierde: queda guardada para poder recalcular esto en cualquier momento.</small>
+    </div>
+
+    <div class="alert alert-warning" style="max-width: 500px;">
+        <strong>Multa calculada</strong>
+        <ul class="mb-0">
+            <li>Días totales del contrato: @calculo.DiasTotales</li>
+            <li>Días cumplidos hasta la fecha elegida: @calculo.DiasCumplidos</li>
+            <li>Días restantes: @calculo.DiasRestantes</li>
+            <li>Porcentaje aplicado: @calculo.Porcentaje.ToString("P0") (@(calculo.DiasCumplidos < calculo.DiasTotales / 2.0 ? "cumplió menos de la mitad" : "cumplió la mitad o más"))</li>
+            <li><strong>Multa a cobrar: @calculo.Monto.ToString("C")</strong></li>
+        </ul>
+    </div>
+
+    <p class="text-muted">
+        Al confirmar, se registra la fecha de finalización en la reserva y se carga automáticamente
+        un pago por el monto de la multa. Esta acción no se puede deshacer (no se devuelve dinero).
+    </p>
+
+    <input type="submit" value="Confirmar finalización y cobrar multa" class="btn btn-danger"
+    <a asp-action="Details" asp-route-id="@Model.IdReserva" class="btn btn-secondary">Cancelar</a>
+</form>
