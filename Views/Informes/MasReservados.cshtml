@@ -1,0 +1,27 @@
+@model List<InmuebleConReservas>
+@{
+    ViewData["Title"] = "Inmuebles más reservados";
+}
+
+<h4>Inmuebles más reservados (últimos @ViewBag.Dias días)</h4>
+<hr />
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Dirección</th>
+            <th>Propietario</th>
+            <th>Cantidad de reservas</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Direccion</td>
+                <td>@item.NombrePropietario</td>
+                <td>@item.CantidadReservas</td>
+            </tr>
+        }
+    </tbody>
+</table>

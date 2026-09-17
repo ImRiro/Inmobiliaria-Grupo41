@@ -5,8 +5,7 @@ public interface IRepositorioReserva
     Task CrearAsync(Reserva reserva, int? idUsuario);
     Task ActualizarAsync(Reserva reserva);
     Task EliminarAsync(int id);
-
     Task<bool> ExisteSolapamientoAsync(int idInmueble, DateTime desde, DateTime hasta, int? idReservaExcluir = null);
-
     Task FinalizarConMultaAsync(int idReserva, DateTime fechaFinalizacion, decimal montoMulta, int? idUsuario);
+    Task<List<InmuebleConReservas>> ObtenerMasReservadosAsync(int dias = 365, int top = 10);
 }

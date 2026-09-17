@@ -1,4 +1,5 @@
 @model List<Inmueble>
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
 @{
     ViewData["Title"] = "Inmuebles";
@@ -13,6 +14,7 @@
         <a asp-action="Index" class="float-end">Ver todos</a>
     </div>
 }
+<a  asp-controller="Informes" asp-action="MasReservados" class="btn btn-sm btn-outline-secondary">Inmuebles más reservados en los ultimos 365 dias</a>
 <form method="get" class="form-inline mb-3">
     <select name="disponible" class="form-control" onchange="this.form.submit()">
         <option value="">-- Todos --</option>

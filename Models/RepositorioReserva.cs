@@ -253,4 +253,41 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
         var count = Convert.ToInt32(await command.ExecuteScalarAsync());
         return count > 0;
     }
+
+    public async Task<List<InmuebleConReservas>> ObtenerMasReservadosAsync(int dias = 365, int top = 10)
+    {
+        var lista = new List<InmuebleConReservas>();
+
+        using var connection = new MySqlConnection(connectionString);
+        await connection.OpenAsync();
+
+        var query = @"
+            SELECT i.Id, i.Direccion, CONCAT(p.Nombre, ' ', p.Apellido) AS NombrePropietario,
+                COUNT(r.Id) AS CantidadReservas
+            FROM Inmueble i
+            INNER JOIN Propietarios p ON i.IdPropietario = p.Id
+            INNER JOIN Reserva r ON r.IdInmueble = i.Id
+            WHERE r.Fecha_Desde >= @FechaLimite
+            GROUP BY i.Id, i.Direccion, p.Nombre, p.Apellido
+            ORDER BY CantidadReservas DESC
+            LIMIT @Top";
+
+        using var command = new MySqlCommand(query, connection);
+        command.Parameters.AddWithValue("@FechaLimite", DateTime.Today.AddDays(-dias));
+        command.Parameters.AddWithValue("@Top", top);
+
+        using var reader = await command.ExecuteReaderAsync();
+        while (await reader.ReadAsync())
+        {
+            lista.Add(new InmuebleConReservas
+            {
+                IdInmueble = reader.GetInt32(reader.GetOrdinal("Id")),
+                Direccion = reader.GetString(reader.GetOrdinal("Direccion")),
+                NombrePropietario = reader.GetString(reader.GetOrdinal("NombrePropietario")),
+                CantidadReservas = reader.GetInt32(reader.GetOrdinal("CantidadReservas"))
+            });
+        }
+
+        return lista;
+    }
 }
