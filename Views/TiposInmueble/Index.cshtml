@@ -13,7 +13,6 @@
     {
         <tr>
             <td>@t.Nombre</td>
-            <td>@(t.Activo ? "Sí" : "No")</td>
             <td>
                 <a asp-action="Details" asp-route-id="@t.IdTipoInmueble" class="btn btn-sm btn-outline-secondary">Detalles</a>
                 <a asp-action="Edit" asp-route-id="@t.IdTipoInmueble" class="btn btn-sm btn-outline-primary">Editar</a>

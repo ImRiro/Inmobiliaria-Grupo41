@@ -15,7 +15,7 @@ public class RepositorioTipoInmueble : RepositorioBase, IRepositorioTipoInmueble
         using var connection = new MySqlConnection(connectionString);
         await connection.OpenAsync();
 
-        var query = "SELECT Id, Nombre, Activo FROM TipoInmueble";
+        var query = "SELECT Id, Nombre FROM TipoInmueble WHERE Activo = 1";
         using var command = new MySqlCommand(query, connection);
         using var reader = await command.ExecuteReaderAsync();
 
@@ -24,8 +24,7 @@ public class RepositorioTipoInmueble : RepositorioBase, IRepositorioTipoInmueble
             lista.Add(new TipoInmueble
             {
                 IdTipoInmueble = reader.GetInt32(reader.GetOrdinal("Id")),
-                Nombre = reader.GetString(reader.GetOrdinal("Nombre")),
-                Activo = reader.GetBoolean(reader.GetOrdinal("Activo"))
+                Nombre = reader.GetString(reader.GetOrdinal("Nombre"))
             });
         }
 
@@ -37,7 +36,7 @@ public class RepositorioTipoInmueble : RepositorioBase, IRepositorioTipoInmueble
         using var connection = new MySqlConnection(connectionString);
         await connection.OpenAsync();
 
-        var query = "SELECT Id, Nombre, Activo FROM TipoInmueble WHERE Id = @Id";
+        var query = "SELECT Id, Nombre FROM TipoInmueble WHERE Id = @Id AND Activo = 1";
         using var command = new MySqlCommand(query, connection);
         command.Parameters.AddWithValue("@Id", id);
 
@@ -47,8 +46,7 @@ public class RepositorioTipoInmueble : RepositorioBase, IRepositorioTipoInmueble
             return new TipoInmueble
             {
                 IdTipoInmueble = reader.GetInt32(reader.GetOrdinal("Id")),
-                Nombre = reader.GetString(reader.GetOrdinal("Nombre")),
-                Activo = reader.GetBoolean(reader.GetOrdinal("Activo"))
+                Nombre = reader.GetString(reader.GetOrdinal("Nombre"))
             };
         }
         return null;
