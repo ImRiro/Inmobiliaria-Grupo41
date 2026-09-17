@@ -12,22 +12,33 @@ public class Inmueble
     [Required,ForeignKey(name: "IdTipoInmueble")]
     public int IdTipoInmueble { get; set; }
 
-    [Required, StringLength(50), Display(Name = "Direccion")]
+    [Required]
+    [StringLength(255, ErrorMessage = "La dirección no puede superar los 255 caracteres")]
+    [Display(Name = "Dirección")]
     public string Direccion { get; set; } = "";
 
-    [Required, Display(Name = "Latitud")]
+    [Required]
+    [Range(-90, 90, ErrorMessage = "La latitud debe estar entre -90 y 90")]
+    [Display(Name = "Latitud")]
     public decimal Latitud { get; set; } = 0;
 
-    [Required, Display(Name = "Longitud")]
+    [Required]
+    [Range(-180, 180, ErrorMessage = "La longitud debe estar entre -180 y 180")]
+    [Display(Name = "Longitud")]
     public decimal Longitud { get; set; } = 0;
 
-    [Required, Display(Name = "Activo")]
+    [Required]
+    [Display(Name = "Activo")]
     public bool Activo { get; set; } = false;
 
-    [Required, Range(0, int.MaxValue, ErrorMessage = "Las habitaciones no pueden ser negativas"), Display(Name = "Habitaciones")]
+    [Required]
+    [Range(0, int.MaxValue, ErrorMessage = "Las habitaciones no pueden ser negativas")]
+    [Display(Name = "Habitaciones")]
     public int Habitaciones { get; set; } = 0;
 
-    [Required, Range(0, double.MaxValue, ErrorMessage = "Los metros cuadrados no pueden ser negativos"), Display(Name = "Metros Cuadrados")]
+    [Required]
+    [Range(0, 99999999.99, ErrorMessage = "Los metros cuadrados deben estar entre 0 y 99.999.999,99")]
+    [Display(Name = "Metros Cuadrados")]
     public decimal Metros_Cuadrados { get; set; } = 0;
 
 
