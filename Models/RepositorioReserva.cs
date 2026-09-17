@@ -198,7 +198,7 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
 
         try
         {
-            var queryReserva = "UPDATE Reserva SET Fecha_Cancelacion = @Fecha AND IdUsuarioAnulador = @IdUsuario WHERE Id = @Id AND Fecha_Cancelacion IS NULL";
+            var queryReserva = "UPDATE Reserva SET Fecha_Cancelacion = @Fecha, IdUsuarioAnulador = @IdUsuario WHERE Id = @Id AND Fecha_Cancelacion IS NULL";
             using (var cmdReserva = new MySqlCommand(queryReserva, connection, transaction))
             {
                 cmdReserva.Parameters.AddWithValue("@Id", idReserva);
@@ -230,5 +230,27 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
             await transaction.RollbackAsync();
             throw;
         }
+    }
+
+    public async Task<bool> ExisteSolapamientoAsync(int idInmueble, DateTime desde, DateTime hasta, int? idReservaExcluir = null)
+    {
+        using var connection = new MySqlConnection(connectionString);
+        await connection.OpenAsync();
+
+        var query = @"SELECT COUNT(*) FROM Reserva
+                    WHERE IdInmueble = @IdInmueble
+                        AND Fecha_Cancelacion IS NULL
+                        AND Fecha_Desde < @Hasta
+                        AND Fecha_Hasta > @Desde
+                        AND (@IdReservaExcluir IS NULL OR Id <> @IdReservaExcluir)";
+
+        using var command = new MySqlCommand(query, connection);
+        command.Parameters.AddWithValue("@IdInmueble", idInmueble);
+        command.Parameters.AddWithValue("@Desde", desde.Date);
+        command.Parameters.AddWithValue("@Hasta", hasta.Date);
+        command.Parameters.AddWithValue("@IdReservaExcluir", (object?)idReservaExcluir ?? DBNull.Value);
+
+        var count = Convert.ToInt32(await command.ExecuteScalarAsync());
+        return count > 0;
     }
 }

@@ -70,6 +70,11 @@ public class ReservasController : Controller
             ModelState.AddModelError(nameof(reserva.Fecha_Hasta), "La fecha hasta debe ser posterior a la fecha desde");
         }
 
+        if (ModelState.IsValid && await repositorio.ExisteSolapamientoAsync(reserva.IdInmueble, reserva.Fecha_Desde, reserva.Fecha_Hasta))
+        {
+            ModelState.AddModelError(string.Empty, "El inmueble ya tiene una reserva en ese rango de fechas.");
+        }
+
         if (!ModelState.IsValid)
         {
             await CargarSelectAsync(reserva.IdInmueble, reserva.IdInquilino);
@@ -88,6 +93,10 @@ public class ReservasController : Controller
     {
         var reserva = await repositorio.ObtenerPorIdAsync(id);
         if (reserva == null) return NotFound();
+        if (ModelState.IsValid && await repositorio.ExisteSolapamientoAsync(reserva.IdInmueble, reserva.Fecha_Desde, reserva.Fecha_Hasta, reserva.IdReserva))
+        {
+            ModelState.AddModelError(string.Empty, "El inmueble ya tiene una reserva en ese rango de fechas.");
+        }
         await CargarSelectAsync(reserva.IdInmueble, reserva.IdInquilino);
         return View(reserva);
     }
