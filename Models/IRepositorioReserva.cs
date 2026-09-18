@@ -10,4 +10,5 @@ public interface IRepositorioReserva
     Task<List<InmuebleConReservas>> ObtenerMasReservadosAsync(int dias = 365, int top = 10);
     Task<List<Inmueble>> ObtenerSinReservasAsync(int dias = 30);
     Task<List<ReservaVigente>> ObtenerVigentesAsync();
+    Task<List<ReservaPorVencer>> ObtenerQueTerminanEnAsync(int dias);
 }

@@ -36,4 +36,14 @@ public class InformesController : Controller
 
         return View(lista);
     }
+
+    [HttpGet]
+    public async Task<IActionResult> TerminanEn(int dias = 30)
+    {
+        ViewBag.Dias = dias;
+
+        var lista = await repositorioReserva.ObtenerQueTerminanEnAsync(dias);
+
+        return View(lista);
+    }
 }
