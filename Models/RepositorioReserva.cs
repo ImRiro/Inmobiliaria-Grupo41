@@ -325,4 +325,50 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
 
         return lista;
     }
+
+    public async Task<List<ReservaVigente>> ObtenerVigentesAsync()
+    {
+        var lista = new List<ReservaVigente>();
+
+        using var connection = new MySqlConnection(connectionString);
+        await connection.OpenAsync();
+
+        var query = @"
+            SELECT r.Id,
+                i.Direccion AS DireccionInmueble,
+                CONCAT(q.Nombre, ' ', q.Apellido) AS NombreInquilino,
+                r.Fecha_Desde,
+                r.Fecha_Hasta,
+                r.Monto_Diario,
+                r.Costo_Total
+            FROM Reserva r
+            INNER JOIN Inmueble i ON r.IdInmueble = i.Id
+            INNER JOIN Inquilinos q ON r.IdInquilino = q.Id
+            WHERE r.Fecha_Desde <= @Hoy
+            AND r.Fecha_Hasta >= @Hoy
+            AND r.Fecha_Cancelacion IS NULL
+            ORDER BY r.Fecha_Hasta";
+
+        using var command = new MySqlCommand(query, connection);
+
+        command.Parameters.AddWithValue("@Hoy", DateTime.Today);
+
+        using var reader = await command.ExecuteReaderAsync();
+
+        while (await reader.ReadAsync())
+        {
+            lista.Add(new ReservaVigente
+            {
+                IdReserva = reader.GetInt32(reader.GetOrdinal("Id")),
+                DireccionInmueble = reader.GetString(reader.GetOrdinal("DireccionInmueble")),
+                NombreInquilino = reader.GetString(reader.GetOrdinal("NombreInquilino")),
+                Fecha_Desde = reader.GetDateTime(reader.GetOrdinal("Fecha_Desde")),
+                Fecha_Hasta = reader.GetDateTime(reader.GetOrdinal("Fecha_Hasta")),
+                Monto_Diario = reader.GetDecimal(reader.GetOrdinal("Monto_Diario")),
+                Costo_Total = reader.GetDecimal(reader.GetOrdinal("Costo_Total"))
+            });
+        }
+
+        return lista;
+    }
 }

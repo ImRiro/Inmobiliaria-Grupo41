@@ -28,4 +28,12 @@ public class InformesController : Controller
 
         return View(lista);
     }
+
+    [HttpGet]
+    public async Task<IActionResult> Vigentes()
+    {
+        var lista = await repositorioReserva.ObtenerVigentesAsync();
+
+        return View(lista);
+    }
 }

@@ -1,4 +1,5 @@
 @model List<Reserva>
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
 @{
     ViewData["Title"] = "Reservas";
@@ -7,6 +8,7 @@
 <h1>Reservas</h1>
 <a asp-action="Create" class="btn btn-primary">Nueva</a>
 <a asp-action="Disponibilidad" class="btn btn-outline-primary">Buscar inmueble disponible</a>
+<a  asp-controller="Informes" asp-action="Vigentes" class="btn btn-sm btn-outline-secondary">Reservas vigentes</a>
 <table class="table">
     <thead>
         <tr>

@@ -9,4 +9,5 @@ public interface IRepositorioReserva
     Task FinalizarConMultaAsync(int idReserva, DateTime fechaFinalizacion, decimal montoMulta, int? idUsuario);
     Task<List<InmuebleConReservas>> ObtenerMasReservadosAsync(int dias = 365, int top = 10);
     Task<List<Inmueble>> ObtenerSinReservasAsync(int dias = 30);
+    Task<List<ReservaVigente>> ObtenerVigentesAsync();
 }
