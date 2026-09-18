@@ -40,6 +40,16 @@
     @foreach (var i in Model)
     {
         <tr>
+            <td>
+                @if (!string.IsNullOrEmpty(i.RutaPortada))
+                {
+                    <img src="@i.RutaPortada" style="width:60px;height:60px;object-fit:cover" class="rounded" />
+                }
+                else
+                {
+                    <span class="text-muted">Sin imagen</span>
+                }
+            </td>
             <td>@i.Direccion</td>
             <td>@i.NombrePropietario</td>
             <td>@i.NombreTipoInmueble</td>

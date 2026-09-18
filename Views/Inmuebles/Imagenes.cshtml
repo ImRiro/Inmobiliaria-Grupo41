@@ -1,0 +1,36 @@
+@model List<ImagenInmueble>
+@{
+    var inmueble = (ViewBag.Inmueble as Inmueble)!;
+    ViewData["Title"] = "Imágenes del inmueble";
+}
+@if (TempData["ErrorImagen"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorImagen"]</div>
+}
+
+<h4>Imágenes — @inmueble.Direccion</h4>
+<hr />
+
+<form asp-action="AgregarImagen" method="post" enctype="multipart/form-data" class="mb-4">
+    <input type="hidden" name="idInmueble" value="@inmueble.IdInmueble" />
+    <div class="form-group">
+        <input type="file" name="archivo" class="form-control" accept="image/*" required />
+    </div>
+    <button type="submit" class="btn btn-primary mt-2">Agregar imagen</button>
+</form>
+
+<div class="row">
+    @foreach (var imagen in Model)
+    {
+        <div class="col-md-3 mb-3">
+            <img src="@imagen.Url" class="img-fluid rounded" />
+            <form asp-action="EliminarImagen" method="post" class="mt-1">
+                <input type="hidden" name="id" value="@imagen.Id" />
+                <input type="hidden" name="idInmueble" value="@inmueble.IdInmueble" />
+                <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+            </form>
+        </div>
+    }
+</div>
+
+<a asp-action="Index" class="btn btn-secondary">Volver</a>

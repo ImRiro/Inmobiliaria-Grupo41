@@ -53,4 +53,6 @@ public class Inmueble
 
     [Display(Name = "Tipo")]
     public string? NombreTipoInmueble { get; set; }
+
+    public string? RutaPortada { get; set; }
 }

@@ -7,6 +7,11 @@
 <h1>Detalle del inmueble</h1>
 <div>
     <dl class="row">
+        @if (!string.IsNullOrEmpty(Model.RutaPortada))
+        {
+            <img src="@Model.RutaPortada" style="max-width:100%;max-height:300px;object-fit:cover" class="rounded mb-3" />
+        }
+        
         <dt class="col-sm-3">Id</dt>
         <dd class="col-sm-9">@Model.IdInmueble</dd>
 
@@ -33,6 +38,11 @@
 
         <dt class="col-sm-3">Porcentaje de Seña</dt>
         <dd class="col-sm-9">@Model.Porcentaje_Sena.ToString("0.##")%</dd>
+
+        <dt class="col-sm-3">Imágenes</dt>
+        <dd class="col-sm-9">
+            <a asp-action="Imagenes" asp-route-id="@Model.IdInmueble" class="btn btn-sm btn-outline-secondary">Ver imágenes</a>
+        </dd>
 
         <dt class="col-sm-3">Disponible</dt>
         <dd class="col-sm-9">@(Model.Disponible ? "Sí" : "No")</dd>

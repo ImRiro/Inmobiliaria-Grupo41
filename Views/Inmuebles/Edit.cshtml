@@ -8,7 +8,7 @@
 <hr />
 <div class="row">
     <div class="col-md-6">
-        <form asp-action="Edit">
+        <form asp-action="Edit" enctype="multipart/form-data">
             <input type="hidden" asp-for="IdInmueble" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
@@ -62,6 +62,15 @@
                 <label asp-for="Porcentaje_Sena" class="control-label"></label>
                 <input asp-for="Porcentaje_Sena" class="form-control" />
                 <span asp-validation-for="Porcentaje_Sena" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">Imagen de portada</label>
+                @if (!string.IsNullOrEmpty(Model.RutaPortada))
+                {
+                    <img src="@Model.RutaPortada" style="max-height:150px" class="d-block mb-2" />
+                }
+                <input type="file" name="archivoPortada" class="form-control" accept="image/*" />
             </div>
 
             <div class="form-check my-3">

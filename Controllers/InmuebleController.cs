@@ -8,21 +8,27 @@ public class InmueblesController : Controller
     private readonly IRepositorioInmueble repositorio;
     private readonly IRepositorioPropietario repositorioPropietario;
     private readonly IRepositorioTipoInmueble repositorioTipoInmueble;
+    private readonly IRepositorioImagenInmueble repositorioImagen;
     private readonly IConfiguration config;
     private readonly ILogger<InmueblesController> logger;
+    private readonly IFileService fileService;
 
     public InmueblesController(
         IRepositorioInmueble repo,
         IRepositorioPropietario repoPropietario,
         IRepositorioTipoInmueble repoTipoInmueble,
+        IRepositorioImagenInmueble repoImagenInmueble,
         IConfiguration config,
-        ILogger<InmueblesController> logger)
+        ILogger<InmueblesController> logger,
+        IFileService fileService)
     {
         this.repositorio = repo;
         this.repositorioPropietario = repoPropietario;
         this.repositorioTipoInmueble = repoTipoInmueble;
+        this.repositorioImagen = repoImagenInmueble;
         this.config = config;
         this.logger = logger;
+        this.fileService = fileService;
     }
 
     private async Task CargarSelectsAsync(int? idPropietarioSeleccionado = null, int? idTipoSeleccionado = null)
@@ -85,13 +91,35 @@ public class InmueblesController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(Inmueble inmueble)
+    public async Task<IActionResult> Edit(Inmueble inmueble, IFormFile? archivoPortada)
     {
         if (!ModelState.IsValid)
         {
             await CargarSelectsAsync(inmueble.IdPropietario, inmueble.IdTipoInmueble);
             return View(inmueble);
         }
+
+        var actual = await repositorio.ObtenerPorIdAsync(inmueble.IdInmueble);
+
+        if (archivoPortada != null)
+        {
+            try
+            {
+                inmueble.RutaPortada = await fileService.GuardarPortadaInmuebleAsync(archivoPortada, actual?.RutaPortada);
+            }
+            catch (InvalidOperationException ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                await CargarSelectsAsync(inmueble.IdPropietario, inmueble.IdTipoInmueble);
+                inmueble.RutaPortada = actual?.RutaPortada;
+                return View(inmueble);
+            }
+        }
+        else
+        {
+            inmueble.RutaPortada = actual?.RutaPortada;
+        }
+
         await repositorio.ActualizarAsync(inmueble);
         return RedirectToAction(nameof(Index));
     }
@@ -110,5 +138,52 @@ public class InmueblesController : Controller
     {
         await repositorio.EliminarAsync(id);
         return RedirectToAction(nameof(Index));
+    }
+
+    public async Task<IActionResult> Imagenes(int id)
+    {
+        var inmueble = await repositorio.ObtenerPorIdAsync(id);
+        if (inmueble == null) return NotFound();
+
+        ViewBag.Inmueble = inmueble;
+        var imagenes = await repositorioImagen.ObtenerPorInmuebleAsync(id);
+        return View(imagenes);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AgregarImagen(int idInmueble, IFormFile archivo)
+    {
+        var inmueble = await repositorio.ObtenerPorIdAsync(idInmueble);
+        if (inmueble == null) return NotFound();
+
+        try
+        {
+            var ruta = await fileService.GuardarImagenGaleriaAsync(archivo);
+            if (ruta != null)
+            {
+                await repositorioImagen.AltaAsync(new ImagenInmueble { IdInmueble = idInmueble, Url = ruta });
+            }
+        }
+        catch (InvalidOperationException ex)
+        {
+            TempData["ErrorImagen"] = ex.Message;
+        }
+
+        return RedirectToAction(nameof(Imagenes), new { id = idInmueble });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> EliminarImagen(int id, int idInmueble)
+    {
+        var imagen = await repositorioImagen.ObtenerPorIdAsync(id);
+        if (imagen != null && imagen.IdInmueble == idInmueble)
+        {
+            fileService.EliminarImagenGaleria(imagen.Url);
+            await repositorioImagen.EliminarAsync(id);
+        }
+
+        return RedirectToAction(nameof(Imagenes), new { id = idInmueble });
     }
 }

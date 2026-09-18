@@ -19,14 +19,12 @@ public class PropietariosController : Controller
 
     public async Task<IActionResult> Index(int pagina = 1, int tamanoPagina = 10)
     {
-        // Validaciones defensivas
         if (pagina < 1) pagina = 1;
         if (tamanoPagina < 1 || tamanoPagina > 100) tamanoPagina = 10;
 
         var total = await repositorio.ContarAsync();
         var totalPaginas = (int)Math.Ceiling((double)total / tamanoPagina);
 
-        // Si piden una página mayor al total, redirigir a la última
         if (pagina > totalPaginas && totalPaginas > 0)
             pagina = totalPaginas;
 

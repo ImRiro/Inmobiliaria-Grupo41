@@ -10,7 +10,7 @@ public class RepositorioInmueble : RepositorioBase, IRepositorioInmueble
     
     private const string SelectBase = @"
         SELECT i.Id, i.IdPropietario, i.IdTipoInmueble, i.Direccion, i.Latitud, i.Longitud, i.Porcentaje_Sena,
-               i.Disponible, i.Metros_Cuadrados, i.Habitaciones,
+               i.Disponible, i.Metros_Cuadrados, i.Habitaciones, i.ruta_portada,
                CONCAT(p.Nombre, ' ', p.Apellido) AS NombrePropietario,
                t.Nombre AS NombreTipoInmueble
         FROM Inmueble i
@@ -33,7 +33,8 @@ public class RepositorioInmueble : RepositorioBase, IRepositorioInmueble
             Metros_Cuadrados = reader.GetInt32(reader.GetOrdinal("Metros_Cuadrados")),
             Habitaciones = reader.GetInt32(reader.GetOrdinal("Habitaciones")),
             NombrePropietario = reader.GetString(reader.GetOrdinal("NombrePropietario")),
-            NombreTipoInmueble = reader.GetString(reader.GetOrdinal("NombreTipoInmueble"))
+            NombreTipoInmueble = reader.GetString(reader.GetOrdinal("NombreTipoInmueble")),
+            RutaPortada = reader.IsDBNull(reader.GetOrdinal("ruta_portada")) ? null : reader.GetString("ruta_portada"),
         };
     }
 
@@ -109,7 +110,7 @@ public class RepositorioInmueble : RepositorioBase, IRepositorioInmueble
 
         var query = @"UPDATE Inmueble SET IdPropietario = @IdPropietario, IdTipoInmueble = @IdTipoInmueble, Direccion = @Direccion, 
                       Latitud = @Latitud, Longitud = @Longitud, Porcentaje_Sena = @Porcentaje_Sena, Disponible = @Disponible, Metros_Cuadrados = @Metros_Cuadrados, 
-                      Habitaciones = @Habitaciones WHERE Id = @IdInmueble";
+                      Habitaciones = @Habitaciones, ruta_portada = @ruta_portada WHERE Id = @IdInmueble";
         using var command = new MySqlCommand(query, connection);
         command.Parameters.AddWithValue("@IdInmueble", inmueble.IdInmueble);
         command.Parameters.AddWithValue("@IdPropietario", inmueble.IdPropietario);
@@ -121,6 +122,7 @@ public class RepositorioInmueble : RepositorioBase, IRepositorioInmueble
         command.Parameters.AddWithValue("@Disponible", inmueble.Disponible);
         command.Parameters.AddWithValue("@Metros_Cuadrados", inmueble.Metros_Cuadrados);
         command.Parameters.AddWithValue("@Habitaciones", inmueble.Habitaciones);
+        command.Parameters.AddWithValue("@ruta_portada", (object?)inmueble.RutaPortada ?? DBNull.Value);
 
         await command.ExecuteNonQueryAsync();
     }

@@ -122,11 +122,7 @@ public class RepositorioPropietario : RepositorioBase, IRepositorioPropietario
         using var connection = new MySqlConnection(connectionString);
         await connection.OpenAsync();
 
-        var query = @"SELECT Id, DNI, Nombre, Apellido, Email 
-                    FROM Propietarios 
-                    WHERE Activo = 1
-                    ORDER BY Apellido, Nombre
-                    LIMIT @Limit OFFSET @Offset";
+        var query = @"SELECT Id, DNI, Nombre, Apellido, Email FROM Propietarios WHERE Activo = 1 ORDER BY Apellido, Nombre LIMIT @Limit OFFSET @Offset";
 
         using var command = new MySqlCommand(query, connection);
         command.Parameters.AddWithValue("@Limit", tamanoPagina);
