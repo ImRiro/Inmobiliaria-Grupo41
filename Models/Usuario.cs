@@ -37,6 +37,10 @@ public class Usuario
     [StringLength(500), Display(Name = "Avatar")]
     public string? AvatarUrl { get; set; }
 
+    [NotMapped]
+    [Display(Name = "Imagen de avatar")]
+    public IFormFile? AvatarFile { get; set; }
+
     [Display(Name = "Activo")]
     public bool Activo { get; set; } = true;
 

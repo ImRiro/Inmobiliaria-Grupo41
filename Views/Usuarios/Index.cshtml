@@ -2,11 +2,27 @@
 <h1>Usuarios</h1>
 <a asp-action="Create" class="btn btn-primary">Nuevo</a>
 <table class="table">
-    <thead><tr><th>Nombre</th><th>Email</th><th>Rol</th><th></th></tr></thead>
+    <thead>
+        <tr><th></th><th>Nombre</th><th>Email</th><th>Rol</th><th></th></tr>
+    </thead>
     <tbody>
     @foreach (var u in Model)
     {
         <tr>
+            <td>
+                @if (!string.IsNullOrEmpty(u.AvatarUrl))
+                {
+                    <img src="@u.AvatarUrl" alt="Avatar" class="rounded-circle"
+                         style="width:40px;height:40px;object-fit:cover;" />
+                }
+                else
+                {
+                    <div class="rounded-circle bg-secondary text-white d-inline-flex align-items-center justify-content-center"
+                         style="width:40px;height:40px;">
+                        @(u.Nombre?.FirstOrDefault())
+                    </div>
+                }
+            </td>
             <td>@u.NombreCompleto</td>
             <td>@u.Email</td>
             <td>@u.Rol</td>

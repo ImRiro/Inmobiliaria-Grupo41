@@ -8,8 +8,20 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
+        <form asp-action="Create" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group text-center mb-3">
+                <img id="avatarPreview" src="#" alt="Vista previa"
+                     class="rounded-circle d-none"
+                     style="width:100px;height:100px;object-fit:cover;" />
+                <div id="avatarPlaceholder"
+                     class="rounded-circle bg-secondary text-white d-inline-flex align-items-center justify-content-center"
+                     style="width:100px;height:100px;font-size:36px;">
+                    ?
+                </div>
+            </div>
+
             <div class="form-group">
                 <label asp-for="Nombre" class="control-label"></label>
                 <input asp-for="Nombre" class="form-control" />
@@ -34,14 +46,24 @@
                 <label asp-for="ConfirmarClave" class="control-label"></label>
                 <input asp-for="ConfirmarClave" class="form-control" />
                 <span asp-validation-for="ConfirmarClave" class="text-danger"></span>
-            </div>      
+            </div>
+
+            <div class="form-group">
+                <label asp-for="AvatarFile" class="control-label"></label>
+                <input asp-for="AvatarFile" type="file" accept="image/*" class="form-control" />
+                <span asp-validation-for="AvatarFile" class="text-danger"></span>
+                <small class="text-muted">Opcional. Formatos: jpg, png, gif, webp. Máx 2 MB.</small>
+            </div>
+
             <div class="form-group">
                 <label asp-for="Rol" class="control-label"></label>
                 <select asp-for="Rol" class="form-control">
                     <option value="Empleado">Empleado</option>
                     <option value="Administrador">Administrador</option>
                 </select>
+                <span asp-validation-for="Rol" class="text-danger"></span>
             </div>
+
             <div class="form-group mt-3">
                 <input type="submit" value="Crear" class="btn btn-primary" />
             </div>
@@ -55,4 +77,20 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        document.querySelector('input[type="file"][accept="image/*"]').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const img = document.getElementById('avatarPreview');
+            const placeholder = document.getElementById('avatarPlaceholder');
+
+            img.src = URL.createObjectURL(file);
+            img.classList.remove('d-none');
+            placeholder.classList.add('d-none');
+
+            img.onload = () => URL.revokeObjectURL(img.src);
+        });
+    </script>
 }

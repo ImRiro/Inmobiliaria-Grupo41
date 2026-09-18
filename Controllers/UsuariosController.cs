@@ -11,11 +11,13 @@ public class UsuariosController : Controller
     private readonly IRepositorioUsuario repositorio;
     private readonly ILogger<UsuariosController> logger;
     private static readonly PasswordHasher<Usuario> hasher = new();
+    private readonly IFileService fileService;
 
-    public UsuariosController(IRepositorioUsuario repo, ILogger<UsuariosController> logger)
+    public UsuariosController(IRepositorioUsuario repo, ILogger<UsuariosController> logger, IFileService fileService)
     {
         this.repositorio = repo;
         this.logger = logger;
+        this.fileService = fileService;
     }
 
     [AllowAnonymous]
@@ -89,6 +91,7 @@ public class UsuariosController : Controller
         return View();
     }
 
+    [Authorize(Policy = "Administrador"), HttpGet]
     public async Task<IActionResult> Perfil()
     {
         var usuario = await ObtenerUsuarioActualAsync();
@@ -108,15 +111,28 @@ public class UsuariosController : Controller
         ModelState.Remove(nameof(Usuario.Email));
 
         if (string.IsNullOrWhiteSpace(form.Nombre) || string.IsNullOrWhiteSpace(form.Apellido))
-        {
             ModelState.AddModelError(string.Empty, "Nombre y apellido son obligatorios.");
-        }
 
         if (!ModelState.IsValid)
         {
             form.IdUsuario = usuario.IdUsuario;
             form.Email = usuario.Email;
             form.Rol = usuario.Rol;
+            form.AvatarUrl = usuario.AvatarUrl;
+            return View(form);
+        }
+
+        try
+        {
+            form.AvatarUrl = await fileService.GuardarAvatarAsync(form.AvatarFile, usuario.AvatarUrl);
+        }
+        catch (InvalidOperationException ex)
+        {
+            ModelState.AddModelError(nameof(Usuario.AvatarFile), ex.Message);
+            form.IdUsuario = usuario.IdUsuario;
+            form.Email = usuario.Email;
+            form.Rol = usuario.Rol;
+            form.AvatarUrl = usuario.AvatarUrl;
             return View(form);
         }
 
@@ -161,18 +177,22 @@ public class UsuariosController : Controller
         ModelState.Remove(nameof(Usuario.Clave));
 
         if (string.IsNullOrWhiteSpace(usuario.ClavePlano) || usuario.ClavePlano.Length < 6)
-        {
             ModelState.AddModelError(nameof(Usuario.ClavePlano), "La contraseña debe tener al menos 6 caracteres.");
-        }
 
         var existente = await repositorio.ObtenerPorEmailAsync(usuario.Email);
         if (existente != null)
-        {
             ModelState.AddModelError(nameof(Usuario.Email), "Ya existe un usuario con ese email.");
-        }
 
         if (!ModelState.IsValid)
+            return View(usuario);
+
+        try
         {
+            usuario.AvatarUrl = await fileService.GuardarAvatarAsync(usuario.AvatarFile, null);
+        }
+        catch (InvalidOperationException ex)
+        {
+            ModelState.AddModelError(nameof(Usuario.AvatarFile), ex.Message);
             return View(usuario);
         }
 
@@ -198,6 +218,9 @@ public class UsuariosController : Controller
         ModelState.Remove(nameof(Usuario.ClavePlano));
         ModelState.Remove(nameof(Usuario.ConfirmarClave));
 
+        var original = await repositorio.ObtenerPorIdAsync(usuario.IdUsuario);
+        if (original == null) return NotFound();
+
         if (!ModelState.IsValid)
         {
             return View(usuario);
@@ -207,6 +230,17 @@ public class UsuariosController : Controller
         if (idActual == usuario.IdUsuario.ToString() && usuario.Rol != "Administrador")
         {
             ModelState.AddModelError(nameof(Usuario.Rol), "No podés quitarte tu propio rol de Administrador.");
+            return View(usuario);
+        }
+
+            try
+        {
+            usuario.AvatarUrl = await fileService.GuardarAvatarAsync(usuario.AvatarFile, original.AvatarUrl);
+        }
+        catch (InvalidOperationException ex)
+        {
+            ModelState.AddModelError(nameof(Usuario.AvatarFile), ex.Message);
+            usuario.AvatarUrl = original.AvatarUrl;
             return View(usuario);
         }
 
