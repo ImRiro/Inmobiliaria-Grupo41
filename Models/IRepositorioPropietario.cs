@@ -5,4 +5,6 @@ public interface IRepositorioPropietario
     Task CrearAsync(Propietario propietario);
     Task ActualizarAsync(Propietario propietario);
     Task EliminarAsync(int id);
+    Task<int> ContarAsync();
+    Task<List<Propietario>> ObtenerPaginadoAsync(int pagina, int tamanoPagina);
 }

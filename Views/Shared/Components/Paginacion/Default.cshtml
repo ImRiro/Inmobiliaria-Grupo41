@@ -1,0 +1,43 @@
+@{
+    int paginaActual = ViewBag.PaginaActual;
+    int totalPaginas = ViewBag.TotalPaginas;
+    int tamanoPagina = ViewBag.TamanoPagina;
+    string actionName = ViewBag.ActionName;
+    string controllerName = ViewBag.ControllerName;
+    int inicio = Math.Max(1, paginaActual - 2);
+    int fin = Math.Min(totalPaginas, paginaActual + 2);
+}
+
+@if (totalPaginas > 1)
+{
+    <nav>
+        <ul class="pagination">
+            <li class="page-item @(paginaActual > 1 ? "" : "disabled")">
+                <a class="page-link"
+                   asp-controller="@controllerName"
+                   asp-action="@actionName"
+                   asp-route-pagina="@(paginaActual - 1)"
+                   asp-route-tamanoPagina="@tamanoPagina">Anterior</a>
+            </li>
+
+            @for (int i = inicio; i <= fin; i++)
+            {
+                <li class="page-item @(i == paginaActual ? "active" : "")">
+                    <a class="page-link"
+                       asp-controller="@controllerName"
+                       asp-action="@actionName"
+                       asp-route-pagina="@i"
+                       asp-route-tamanoPagina="@tamanoPagina">@i</a>
+                </li>
+            }
+
+            <li class="page-item @(paginaActual < totalPaginas ? "" : "disabled")">
+                <a class="page-link"
+                   asp-controller="@controllerName"
+                   asp-action="@actionName"
+                   asp-route-pagina="@(paginaActual + 1)"
+                   asp-route-tamanoPagina="@tamanoPagina">Siguiente</a>
+            </li>
+        </ul>
+    </nav>
+}

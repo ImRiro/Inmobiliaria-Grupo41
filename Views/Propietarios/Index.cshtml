@@ -1,10 +1,12 @@
-@model List<Propietario>
+@using Inmobiliaria_.Net_Core.Models
+@model PaginadoViewModel<Propietario>
+
 <h1>Propietarios</h1>
 <a asp-action="Create" class="btn btn-primary">Nuevo</a>
 <table class="table">
     <thead><tr><th>Nombre</th><th>Contacto</th><th></th></tr></thead>
     <tbody>
-    @foreach (var p in Model)
+    @foreach (var p in Model.Elementos)
     {
         <tr>
             <td>@p.DNI</td>
@@ -22,3 +24,9 @@
     }
     </tbody>
 </table>
+
+<vc:paginacion pagina-actual="@Model.PaginaActual"
+               total-paginas="@Model.TotalPaginas"
+               tamano-pagina="@Model.TamanoPagina"
+               action-name="Index"
+               controller-name="Propietarios" />

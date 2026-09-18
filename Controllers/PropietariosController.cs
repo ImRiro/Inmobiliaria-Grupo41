@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Inmobiliaria_.Net_Core.Models;
 
 [Authorize]
 public class PropietariosController : Controller
@@ -16,10 +17,30 @@ public class PropietariosController : Controller
 			this.logger = logger;
 		}
 
-        public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(int pagina = 1, int tamanoPagina = 10)
     {
-        var propietarios = await repositorio.ObtenerTodosAsync();
-        return View(propietarios);
+        // Validaciones defensivas
+        if (pagina < 1) pagina = 1;
+        if (tamanoPagina < 1 || tamanoPagina > 100) tamanoPagina = 10;
+
+        var total = await repositorio.ContarAsync();
+        var totalPaginas = (int)Math.Ceiling((double)total / tamanoPagina);
+
+        // Si piden una página mayor al total, redirigir a la última
+        if (pagina > totalPaginas && totalPaginas > 0)
+            pagina = totalPaginas;
+
+        var propietarios = await repositorio.ObtenerPaginadoAsync(pagina, tamanoPagina);
+
+        var vm = new PaginadoViewModel<Propietario>
+        {
+            Elementos = propietarios,
+            PaginaActual = pagina,
+            TamanoPagina = tamanoPagina,
+            TotalRegistros = total
+        };
+
+        return View(vm);
     }
 
     public IActionResult Create() => View();

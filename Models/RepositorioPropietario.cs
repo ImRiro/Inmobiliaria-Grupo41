@@ -103,4 +103,48 @@ public class RepositorioPropietario : RepositorioBase, IRepositorioPropietario
 
         await command.ExecuteNonQueryAsync();
     }
+
+    public async Task<int> ContarAsync()
+    {
+        using var connection = new MySqlConnection(connectionString);
+        await connection.OpenAsync();
+
+        var query = "SELECT COUNT(*) FROM Propietarios WHERE Activo = 1";
+        using var command = new MySqlCommand(query, connection);
+        var result = await command.ExecuteScalarAsync();
+        return Convert.ToInt32(result);
+    }
+
+    public async Task<List<Propietario>> ObtenerPaginadoAsync(int pagina, int tamanoPagina)
+    {
+        var lista = new List<Propietario>();
+
+        using var connection = new MySqlConnection(connectionString);
+        await connection.OpenAsync();
+
+        var query = @"SELECT Id, DNI, Nombre, Apellido, Email 
+                    FROM Propietarios 
+                    WHERE Activo = 1
+                    ORDER BY Apellido, Nombre
+                    LIMIT @Limit OFFSET @Offset";
+
+        using var command = new MySqlCommand(query, connection);
+        command.Parameters.AddWithValue("@Limit", tamanoPagina);
+        command.Parameters.AddWithValue("@Offset", (pagina - 1) * tamanoPagina);
+
+        using var reader = await command.ExecuteReaderAsync();
+        while (await reader.ReadAsync())
+        {
+            lista.Add(new Propietario
+            {
+                IdPropietario = reader.GetInt32(reader.GetOrdinal("Id")),
+                DNI = reader.GetString(reader.GetOrdinal("DNI")),
+                Nombre = reader.GetString(reader.GetOrdinal("Nombre")),
+                Apellido = reader.GetString(reader.GetOrdinal("Apellido")),
+                Email = reader.GetString(reader.GetOrdinal("Email"))
+            });
+        }
+
+        return lista;
+    }
 }
