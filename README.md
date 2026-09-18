@@ -32,7 +32,7 @@
 
 - Selects con búsqueda/filtro resuelta en el servidor (autocompletado) en los combos de propietario, inmueble e inquilino — hoy cargan todos los registros disponibles
 - Búsqueda por texto resuelta en el servidor en los listados principales (Propietarios, Inquilinos, Inmuebles, Reservas) — actualmente solo cuentan con paginado, sin filtro de búsqueda
-    - Realmente lo deje para el ultimo porque no estaba seguro de que se pedia con la busqueda, pero luego de pensarlo quizas sea esto.
+    - Realmente lo deje para el ultimo porque no estaba seguro de que se pedia con la busqueda desde el servidor, pero es posible que sea esto de busqueda por texto y de ser asi no esta implementado
 
 ## Instrucciones SQL
 
